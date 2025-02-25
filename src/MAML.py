@@ -86,11 +86,13 @@ if __name__ == "__main__":
   for _ in tqdm(range(iters)):
     tasks, query_set = episoder.get_episode()
     fast_adaptions = list()
-    for task in tasks: fast_adaptions.append(model.inner_update(task))
+    for task in tasks:
+      fast_adaptions.append(model.inner_update(task))
     loss = float()
     for feature, label in DataLoader(query_set, shuffle=True):
-      pred = forward(feature, fast_adaptions[torch.argmax(label)])
-      loss += criterion(pred, label)
+      for fast_adaption in fast_adaptions:
+        pred = forward(feature, fast_adaption)
+        loss += criterion(pred, label)
     # for
     loss /= n_way
     whole_loss += loss.item()
