@@ -17,13 +17,14 @@ def forward(x, params):
   return F.softmax(x)
 # forward()
 
-class MAMLNet(nn.Module):
-  def __init__(self, inpt_channels: int, hidn_channels: int, oupt_channels: int):
-    super(MAMLNet, self).__init__()
+class MAML(nn.Module):
+  def __init__(self, inpt_channels: int, hidn_channels: int, oupt_channels: int, lr: float):
+    super(MAML, self).__init__()
     self.conv1 = nn.Conv2d(inpt_channels, hidn_channels, kernel_size=3, padding=1, stride=1)
     self.conv2 = nn.Conv2d(hidn_channels, hidn_channels, kernel_size=3, padding=1, stride=1)
-    self.l1 = nn.Linear(in_features=150528, out_features=oupt_channels)
+    self.l1 = nn.Linear(in_features=200704, out_features=oupt_channels)
     self.relu, self.flatten, self.softmax = nn.ReLU(), nn.Flatten(), nn.Softmax()
+    self.lr = lr
   # __init__
 
   def forward(self, x):
@@ -36,18 +37,9 @@ class MAMLNet(nn.Module):
     x = self.relu(x)
     return self.softmax(x)
   # forward
-# MAMLNet
-
-class MAML:
-  def __init__(self, model_config: tuple, basic_config: tuple, meta_config: tuple, iters: int):
-    self.model = MAMLNet(*model_config).to(device=torch.device("cuda" if torch.cuda.is_available() else "cpu"))
-    self.lr, self.wd = basic_config
-    self.mt_lr, self.mt_wd = meta_config
-    self.iters = iters
-  # __init__()
 
   def inner_update(self, task: MAMLDataset):
-    local_params = {name: param.clone() for name, param in self.model.named_parameters()}
+    local_params = {name: param.clone() for name, param in self.named_parameters()}
     for feature, label in DataLoader(task, shuffle=True):
       pred = forward(feature, local_params)
       loss = nn.MSELoss()(pred, label)
@@ -55,7 +47,7 @@ class MAML:
       local_params = {name: param - self.lr * grad for (name, param), grad in zip(local_params.items(), grads)}
     return local_params
   # inner_update()
-# MAML
+# MAMLNet
 
 if __name__ == "__main__":
   tv.datasets.Omniglot(root="./data/", background=True, download=True)  # download dataset
