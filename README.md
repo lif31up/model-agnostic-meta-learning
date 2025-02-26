@@ -9,7 +9,7 @@ This repository implements a Model-Agnostic Meta-Learning (MAML) algorithm for f
 
 Few-shot learning focuses on enabling models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing for a set of parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data.
 
-> You can access the full documentation here: **pending**
+> You can access the full documentation here: [gitbook](https://lif31up.gitbook.io/lif31up/meta-learning/model-agnostic-meta-learning-for-fast-adaption-of-deep-networks)
 
 > You can access the test result on colab here: [colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018#scrollTo=iMjrWpR0FxHn)
 
