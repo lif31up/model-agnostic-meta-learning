@@ -19,7 +19,7 @@ def main():
   parser_train.add_argument("--iters", type=int, help="how much iteration your model does for an episode")
   parser_train.add_argument("--inner_iters", type=int, help="how much epochs your model does for training")
   parser_train.set_defaults(func=lambda kwargs: train.main(
-    path=kwargs.dataset_path,
+    path=kwargs.path,
     save_to=kwargs.save_to,
     n_way=kwargs.n_way,
     k_shot=kwargs.k_shot,
