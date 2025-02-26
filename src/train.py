@@ -34,7 +34,6 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, iters: 
 
   # train loop
   progress_bar, whole_loss = tqdm(range(epochs)), float()
-
   for _ in progress_bar:
     tasks, query_set = episoder.get_episode()
     fast_adaptions = list()
