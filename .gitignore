@@ -1,5 +1,5 @@
 # user-defined
-data/raw
+**/data/
 *.pth
 
 # pycharm
