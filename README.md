@@ -38,8 +38,8 @@ python run.py train --dataset_path path/to/your/dataset --save_to /path/to/save/
 * `n_way`: number of classes in each episode.
 * `k_shot`: Number of support samples per class.
 * `n-_query`: Number of query samples per class.
-* `iters`: Number of episodes.
-* `inner_iters`: Number of training epochs.
+* `epochs`: Number of episodes.
+* `iters`: Number of training epochs.
 
 ### Evaluation
 ```

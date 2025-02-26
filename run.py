@@ -17,15 +17,15 @@ def main():
   parser_train.add_argument("--k_shot", type=int, help="number of support samples per class")
   parser_train.add_argument("--n_query", type=int, help="number of query samples per class")
   parser_train.add_argument("--iters", type=int, help="how much iteration your model does for an episode")
-  parser_train.add_argument("--inner_iters", type=int, help="how much epochs your model does for training")
+  parser_train.add_argument("--epochs", type=int, help="how much epochs your model does for training")
   parser_train.set_defaults(func=lambda kwargs: train.main(
     path=kwargs.path,
     save_to=kwargs.save_to,
     n_way=kwargs.n_way,
     k_shot=kwargs.k_shot,
     n_query=kwargs.n_query,
-    iters=kwargs.iters,
-    inner_iters=kwargs.inner_iters)
+    epochs=kwargs.epochs,
+    iters=kwargs.iters)
   ) # parser_train.set_defaults()
 
   # download dataset
@@ -35,7 +35,7 @@ def main():
 
   args = parser.parse_args()
   if hasattr(args, 'func'): args.func(args)
-  elif args.path and args.model: eval.main(model=args.model)
+  elif args.model: eval.main(model=args.model)
   else: print("invalid argument. exiting program.")
 # main():
 
