@@ -71,4 +71,4 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, iters: 
   print(f"model save to {save_to}")
 # main
 
-if __name__ == "__main__": main(path="../data/omniglot-py/images_background/Futurama", save_to="./model/model.pth", n_way=5, k_shot=5, n_query=2, epochs=5, iters=5)
+if __name__ == "__main__": main(path="../data/omniglot-py/images_background/Futurama", save_to="./model/model.pth", n_way=5, k_shot=5, n_query=2, epochs=10, iters=20)
