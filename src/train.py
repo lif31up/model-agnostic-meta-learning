@@ -10,9 +10,7 @@ import random
 def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, inner_iters: int, iters: int):
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # init device
 
-  # create dataset
-  tv.datasets.Omniglot(root=path, background=True, download=True)  # download dataset
-  imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")  # load dataset
+  imageset = tv.datasets.ImageFolder(root=path)  # load dataset
 
   # define transform
   transform = tv.transforms.Compose([
@@ -35,8 +33,9 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, inner_i
   optim = torch.optim.Adam(model.parameters(), lr=lr)
 
   # train loop
-  whole_loss = float()
-  for _ in tqdm(range(iters)):
+  progress_bar, whole_loss = tqdm(range(iters)), float()
+
+  for _ in progress_bar:
     tasks, query_set = episoder.get_episode()
     fast_adaptions = list()
     # 이너루프: 개발 작업에 연관되어 지역 매개변수를 갱신합니다.
@@ -56,10 +55,10 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, inner_i
     optim.step()
 
     # print loss
-    print(f" loss: {loss.item()}")
+    progress_bar.set_postfix(loss=loss.item())
     whole_loss += loss.item()
   # for
-  print(f"whole loss: {whole_loss / iters:.4f}")
+  print(f"train ended with whole loss: {whole_loss / iters:.4f}")
 
   # saving the model's parameters and the other data
   features = {
@@ -69,6 +68,7 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, inner_i
     "episoder": episoder
   }  # features
   torch.save(features, save_to)
+  print(f"model save to {save_to}")
 # main
 
-if __name__ == "__main__": main(path="./data/", save_to="./model/model.pth", n_way=5, k_shot=5, n_query=2, inner_iters=15, iters=40)
+if __name__ == "__main__": main(path="../data/omniglot-py/images_background/Futurama", save_to="./model/model.pth", n_way=5, k_shot=5, n_query=2, inner_iters=20, iters=20)
