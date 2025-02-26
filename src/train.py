@@ -6,7 +6,7 @@ from torch import nn
 from src.model.MAML import MAML, forward
 from src.MAMLDataset import MAMLEpisoder
 
-def main(path: str, save_to: str, iters: int = 10, n_way: int = 5, k_shot: int = 5, n_query: int= 2):
+def main(path: str, save_to: str, iters: int = 50, n_way: int = 5, k_shot: int = 5, n_query: int= 2):
   tv.datasets.Omniglot(root=path, background=True, download=True)  # download dataset
   imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")  # load dataset
 
@@ -51,11 +51,10 @@ def main(path: str, save_to: str, iters: int = 10, n_way: int = 5, k_shot: int =
   # saving the model's parameters and the other data
   features = {
     "state": model.state_dict(),
-    "transform": transform,
     "episoder": episoder,
-    "config": model_config
+    "model config": model_config,
   }  # features
   torch.save(features, save_to)
 # main()
 
-if __name__ == "__main__": main(path="./data/", save_to="./model/model.pth", iters=10, n_way=5, k_shot=5, n_query=2)
+if __name__ == "__main__": main(path="./data/", save_to="./model/model.pth", iters=50, n_way=5, k_shot=5, n_query=2)
