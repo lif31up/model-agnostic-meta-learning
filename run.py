@@ -6,7 +6,6 @@ import torchvision as tv
 def main():
   # eval(default)
   parser = argparse.ArgumentParser(description="Few-shot learning using MAML")
-  parser.add_argument("--path", type=str, help="path of your model")
   parser.add_argument("--model", type=str, help="path of your model")
 
   # train
@@ -36,7 +35,7 @@ def main():
 
   args = parser.parse_args()
   if hasattr(args, 'func'): args.func(args)
-  elif args.path and args.model: eval.main(model=args.path)
+  elif args.path and args.model: eval.main(model=args.model)
   else: print("invalid argument. exiting program.")
 # main():
 
