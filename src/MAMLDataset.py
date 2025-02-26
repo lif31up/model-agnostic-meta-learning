@@ -19,7 +19,7 @@ class MAMLDataset(Dataset):
     feature, label = self.dataset[self.indices_t[index]]
     # apply transformation
     feature = self.transform(feature)
-    label = F.one_hot(torch.tensor(label), num_classes=len(self.classes)).float()
+    label = F.one_hot(torch.tensor(self.classes.index(label)), num_classes=len(self.classes)).float()
     return feature, label
   # __getitem__()
 # MAMLDataset
