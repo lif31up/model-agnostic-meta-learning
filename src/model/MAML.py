@@ -1,30 +1,17 @@
 import torch.optim
 from torch import nn
-import torchvision as tv
 from torch.utils.data import DataLoader
-from tqdm import tqdm
-from src.MAMLDataset import MAMLEpisoder, MAMLDataset
 import torch.nn.functional as F
 
-def forward(x, params):
-  x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
-  x = F.relu(x)
-  x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
-  x = F.relu(x)
-  x = x.flatten()
-  x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
-  x = F.relu(x)
-  return F.softmax(x)
-# forward()
-
 class MAML(nn.Module):
-  def __init__(self, inpt_channels: int, hidn_channels: int, oupt_channels: int, lr: float):
+  def __init__(self, inpt_channels: int, hidn_channels: int, oupt_channels: int, lr: float, iters: int):
     super(MAML, self).__init__()
     self.conv1 = nn.Conv2d(inpt_channels, hidn_channels, kernel_size=3, padding=1, stride=1)
     self.conv2 = nn.Conv2d(hidn_channels, hidn_channels, kernel_size=3, padding=1, stride=1)
-    self.l1 = nn.Linear(in_features=200704, out_features=oupt_channels)
+    self.pool = nn.MaxPool2d(3)
+    self.l1 = nn.Linear(in_features=49284, out_features=oupt_channels)
     self.relu, self.flatten, self.softmax = nn.ReLU(), nn.Flatten(), nn.Softmax()
-    self.lr = lr
+    self.lr, self.iters = lr, iters
   # __init__
 
   def forward(self, x):
@@ -32,19 +19,31 @@ class MAML(nn.Module):
     x = self.relu(x)
     x = self.conv2(x)
     x = self.relu(x)
+    x = self.pool(x)
     x = self.flatten(x)
     x = self.l1(x)
-    x = self.relu(x)
     return self.softmax(x)
   # forward
 
-  def inner_update(self, task: MAMLDataset):
+  def _forward(self, x, params):
+    x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
+    x = F.relu(x)
+    x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
+    x = F.relu(x)
+    x = F.max_pool2d(x, kernel_size=3)
+    x = x.flatten()
+    x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
+    return F.softmax(x)
+  # _forward
+
+  def inner_update(self, task, device=None):
     local_params = {name: param.clone() for name, param in self.named_parameters()}
-    for feature, label in DataLoader(task, shuffle=True):
-      pred = forward(feature, local_params)
-      loss = nn.MSELoss()(pred, label)
-      grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
-      local_params = {name: param - self.lr * grad for (name, param), grad in zip(local_params.items(), grads)}
+    for _ in range(self.iters):
+      for feature, label in DataLoader(task, shuffle=True):
+        pred = self._forward(feature, local_params)
+        loss = nn.MSELoss()(pred, label)
+        grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
+        local_params = {name: param - (self.lr * grad) for (name, param), grad in zip(local_params.items(), grads)}
     return local_params
   # inner_update()
 # MAMLNet
