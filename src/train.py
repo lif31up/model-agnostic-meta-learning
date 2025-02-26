@@ -3,10 +3,14 @@ import torchvision as tv
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch import nn
-from src.model.MAML import MAML, forward
+from src.model.MAML import MAML
 from src.MAMLDataset import MAMLEpisoder
+import random
 
-def main(path: str, save_to: str, iters: int = 50, n_way: int = 5, k_shot: int = 5, n_query: int= 2):
+def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, inner_iters: int, iters: int):
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # init device
+
+  # create dataset
   tv.datasets.Omniglot(root=path, background=True, download=True)  # download dataset
   imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")  # load dataset
 
@@ -15,46 +19,56 @@ def main(path: str, save_to: str, iters: int = 50, n_way: int = 5, k_shot: int =
     tv.transforms.Resize((224, 224)),
     tv.transforms.ToTensor(),
     tv.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-  ])  # transform
+  ]) # transform
+
+  # set framework
+  inner_lr, lr = 0.001, 0.001
+  n_inpt, h_inpt, n_output = (3, 9, n_way)
 
   # create FSL episode generator
-  chosen_classes = list(imageset.class_to_idx.values())[:n_way]
+  chosen_classes = random.sample(list(imageset.class_to_idx.values()), n_way)
   episoder = MAMLEpisoder(imageset, chosen_classes, k_shot, n_query, transform)
 
   # init model
-  model_config = (3, 4, n_way, 0.001)
-  model = MAML(*model_config)
+  model = MAML(n_inpt, h_inpt, n_output, inner_lr, inner_iters).to(device)
   criterion = nn.MSELoss()
-  optim = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.01)
+  optim = torch.optim.Adam(model.parameters(), lr=lr)
 
   # train loop
-  whole_loss = 50
+  whole_loss = float()
   for _ in tqdm(range(iters)):
     tasks, query_set = episoder.get_episode()
     fast_adaptions = list()
-    for task in tasks:
-      fast_adaptions.append(model.inner_update(task))
+    # 이너루프: 개발 작업에 연관되어 지역 매개변수를 갱신합니다.
+    for task in tasks: fast_adaptions.append(model.inner_update(task, device))
     loss = float()
+    # 아우터 루프: 모든 작업에 연관되어 메타/전역 매개변수를 갱신하여 이를 실제 모델에 반영합니다.
     for feature, label in DataLoader(query_set, shuffle=True):
       for fast_adaption in fast_adaptions:
-        pred = forward(feature, fast_adaption)
+        pred = model._forward(feature, fast_adaption)
         loss += criterion(pred, label)
     # for for
+
+    # update global parameters
     loss /= n_way
-    whole_loss += loss.item()
     optim.zero_grad()
     loss.backward()
     optim.step()
+
+    # print loss
+    print(f" loss: {loss.item()}")
+    whole_loss += loss.item()
   # for
   print(f"whole loss: {whole_loss / iters:.4f}")
 
   # saving the model's parameters and the other data
   features = {
     "state": model.state_dict(),
-    "episoder": episoder,
-    "model config": model_config,
+    "transform": transform,
+    "model config": (n_inpt, h_inpt, n_output),
+    "episoder": episoder
   }  # features
   torch.save(features, save_to)
-# main()
+# main
 
-if __name__ == "__main__": main(path="./data/", save_to="./model/model.pth", iters=50, n_way=5, k_shot=5, n_query=2)
+if __name__ == "__main__": main(path="./data/", save_to="./model/model.pth", n_way=5, k_shot=5, n_query=2, inner_iters=15, iters=40)
