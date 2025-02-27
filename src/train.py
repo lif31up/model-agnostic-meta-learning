@@ -4,13 +4,12 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch import nn
 from src.model.MAML import MAML
-from src.MAMLEpisoder import MAMLEpisoder
+from src.FewShotEpisoder import FewShotEpisoder
 import random
+from config import HYPERPARAMETER_CONFIG, TRAINING_CONFIG, MODEL_CONFIG
 
-def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, iters: int, epochs: int):
+def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # init device
-
-  imageset = tv.datasets.ImageFolder(root=path)  # load dataset
 
   # define transform
   transform = tv.transforms.Compose([
@@ -19,13 +18,15 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, iters: 
     tv.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
   ]) # transform
 
-  # set model config and hps
-  alpha, beta = 0.001, 0.001
-  model_config = (3, 9, n_way, (iters, alpha))
+  # configuration
+  iters, epochs = TRAINING_CONFIG["iters"], TRAINING_CONFIG["epochs"]
+  alpha, beta = HYPERPARAMETER_CONFIG["alpha"], HYPERPARAMETER_CONFIG["beta"]
+  model_config = (MODEL_CONFIG["n_inpt"], MODEL_CONFIG["n_hidn"], MODEL_CONFIG["n_oupt"], (iters, alpha))
 
   # create FSL episode generator
-  chosen_classes = random.sample(list(imageset.class_to_idx.values()), n_way)
-  episoder = MAMLEpisoder(imageset, chosen_classes, k_shot, n_query, transform)
+  imageset = tv.datasets.ImageFolder(root=DATASET)  # load dataset
+  chosen_classes = random.sample(list(imageset.class_to_idx.values()), N_WAY)
+  episoder = FewShotEpisoder(imageset, chosen_classes, K_SHOT, N_QUERY, transform)
 
   # init model
   model = MAML(*model_config).to(device)
@@ -48,7 +49,7 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, iters: 
     # for for
 
     # update global parameters
-    loss /= n_way
+    loss /= N_WAY
     optim.zero_grad()
     loss.backward()
     optim.step()
@@ -62,12 +63,13 @@ def main(path: str, save_to: str, n_way: int, k_shot: int, n_query: int, iters: 
   # saving the model's parameters and the other data
   features = {
     "state": model.state_dict(),
+    "model_config": model_config,
     "transform": transform,
-    "model config": model_config,
-    "episoder": episoder
+    "chosen_classes": chosen_classes,
+    "framework": (N_WAY, K_SHOT, N_QUERY)
   }  # features
-  torch.save(features, save_to)
-  print(f"model save to {save_to}")
+  torch.save(features, SAVE_TO)
+  print(f"model save to {SAVE_TO}")
 # main
 
-if __name__ == "__main__": main(path="../data/omniglot-py/images_background/Futurama", save_to="./model/model.pth", n_way=5, k_shot=5, n_query=2, epochs=10, iters=20)
+if __name__ == "__main__": train(DATASET="../data/omniglot-py/images_background/Futurama", SAVE_TO="./model/model.pth", N_WAY=5, K_SHOT=5, N_QUERY=2)

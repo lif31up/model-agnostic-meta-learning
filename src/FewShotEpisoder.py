@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import torch
 from torch.utils.data import Dataset
 
-class MAMLDataset(Dataset):
+class FewShotDataset(Dataset):
   def __init__(self, dataset, classes: list, indices_t: list, transform: typing.Callable):
     self.dataset, self.indices_t, self.classes = dataset, indices_t, classes
     self.transform = transform
@@ -24,7 +24,7 @@ class MAMLDataset(Dataset):
   # __getitem__()
 # MAMLDataset
 
-class MAMLEpisoder:
+class FewShotEpisoder:
   def __init__(self, dataset, classes: list, k_shot: int, n_query: int, transform:typing.Callable):
     assert k_shot > 0 or n_query > 0, ValueError("k_shot and n_query must be greater than 0.")
     self.dataset, self.classes = dataset, classes
@@ -44,7 +44,7 @@ class MAMLEpisoder:
     tasks, query_set = list(), list()
     for indices_t in self.indices_t.values():
       indices_t = random.sample(indices_t, self.k_shot + self.n_query)
-      tasks.append(MAMLDataset(self.dataset, self.classes, indices_t[:self.k_shot], self.transform))
+      tasks.append(FewShotDataset(self.dataset, self.classes, indices_t[:self.k_shot], self.transform))
       query_set.extend(indices_t[self.k_shot:])
-    return tasks, MAMLDataset(self.dataset, self.classes, query_set, self.transform)
+    return tasks, FewShotDataset(self.dataset, self.classes, query_set, self.transform)
 # MAMLDataset
