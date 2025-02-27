@@ -38,14 +38,16 @@ python run.py train --dataset_path path/to/your/dataset --save_to /path/to/save/
 * `n_way`: number of classes in each episode.
 * `k_shot`: Number of support samples per class.
 * `n-_query`: Number of query samples per class.
-* `epochs`: Number of episodes.
-* `iters`: Number of training epochs.
+
+> change training configuration from `config.py`
+
 
 ### Evaluation
 ```
 python run.py --path path/to/your/dataset --model path/to/saved/model.pth --n_way 5
 ```
-* `path`: Path to your model.
+* `model`: Path to your model.
+* `dataset`: Path to your dataset.
 
 ### Download Omniglot Dataset
 ```
