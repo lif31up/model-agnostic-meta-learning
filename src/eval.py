@@ -19,39 +19,22 @@ def evaluate(MODEL: str, DATASET: str):
   # create FSL episode generator
   n_way, k_shot, n_query = data["framework"]
   imageset = tv.datasets.ImageFolder(root=DATASET)  # load dataset
+  seen_classes = data['seen_classes']
   unseen_classes = random.sample(list(imageset.class_to_idx.values()), n_way)
   episoder = FewShotEpisoder(imageset, unseen_classes, k_shot, n_query, data["transform"])
 
-  progress_bar, whole_loss = tqdm(range(5)), 0.
-  criterion, optim = nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=HYPERPARAMETER_CONFIG["beta"])
   tasks, query_set = episoder.get_episode()
-  for _ in progress_bar:
-    fast_adaptions = list()
-    for task in tasks: fast_adaptions.append(model.inner_update(task, device))  # inner loop
-    loss = float()
-    for feature, label in DataLoader(query_set, shuffle=True):  # outer loop
-      task_loss = 0.
-      for fast_adaption in fast_adaptions:
-        pred = model.forward(feature, fast_adaption)
-        task_loss += criterion(pred, label)  # sum loss of each tasks
-      loss += task_loss / len(fast_adaptions)  # sum / number of tasks
-    # update params using autograd
-    loss /= len(query_set)
-    optim.zero_grad()
-    loss.backward()
-    optim.step()
-    # progressing and whole loss
-    progress_bar.set_postfix(loss=loss.item())
-    whole_loss += loss.item()
-  # adaption
+  adaptions = list()
+  for task in tasks: adaptions.append(model.inner_update(task))
 
-  model.eval()
-  cnt, n_query_set = 0, len(query_set)
+  count, n_problem = 0, len(query_set)
   for feature, label in DataLoader(query_set, shuffle=True):
-    pred = model.forward(feature)
-    if torch.argmax(pred) == torch.argmax(label): cnt += 1
+    task_i = torch.argmax(label).item()
+    pred = model.forward(feature, adaptions[task_i])
+    if torch.argmax(pred) == torch.argmax(label): count += 1
   # for
-  print(f"accuracy: {cnt / n_query_set:.2f}({cnt}/{n_query_set})")
+  print(f"seen classes: {seen_classes}\nunseen classes: {unseen_classes}\naccuracy: {count / n_problem:.4f}({count}/{n_problem})")
+  # main()
 # main
 
 if __name__ == "__main__": evaluate("./model/model.pth", "../data/omniglot-py/images_background/Futurama")

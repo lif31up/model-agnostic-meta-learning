@@ -14,6 +14,17 @@ class MAML(nn.Module):
     self.epochs, self.alpha = config
   # __init__
 
+  def evaluate(self, x):
+    x = self.conv1(x)
+    x = self.relu(x)
+    x = self.conv2(x)
+    x = self.relu(x)
+    x = self.pool(x)
+    x = self.flatten(x)
+    x = self.l1(x)
+    return self.softmax(x)
+  # evaluate
+
   def forward(self, x, params=None):
     if not params: params = dict(self.named_parameters())
     x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
