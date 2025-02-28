@@ -9,9 +9,8 @@ def evaluate(MODEL: str, DATASET: str):
 
   # load model
   data = torch.load(MODEL)
-  state = data["state"]
   model = MAML(*data["model_config"]).to(device)
-  model.load_state_dict(state)
+  model.load_state_dict(data["state"])
   model.eval()
 
   # create FSL episode generator
