@@ -46,9 +46,9 @@ python run.py train --dataset_path path/to/your/dataset --save_to /path/to/save/
 ```Shell
 python run.py --path path/to/your/dataset --model path/to/saved/model.pth --n_way 5
 # output example:
-# seen classes: [8, 0, 24, 17, 7]
-# unseen classes: [11, 25, 2, 4, 21]
-# accuracy: 0.9714(34/35)
+# seen classes: [10, 11, 18, 1, 3]
+# unseen classes: [19, 1, 4, 2, 13]
+# accuracy: 1.0000(10/10)
 ```
 * `model`: Path to your model.
 * `dataset`: Path to your dataset.
