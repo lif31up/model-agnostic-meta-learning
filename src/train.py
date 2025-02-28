@@ -56,7 +56,7 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
     loss.backward()
     optim.step()
 
-    # print loss progress_bar.set_postfix(loss=loss.item())
+    progress_bar.set_postfix(loss=loss.item())
     whole_loss += loss.item()
   # for
   print(f"train ended with whole loss: {whole_loss / iters:.4f}")
