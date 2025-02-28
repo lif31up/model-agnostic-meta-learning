@@ -24,16 +24,16 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
   ])  # transform
   # create FewShotEpisoder which creates tuple of (support set, query set)
   imageset = tv.datasets.ImageFolder(root=DATASET)  # load dataset
-  chosen_classes = random.sample(list(imageset.class_to_idx.values()), N_WAY)
-  episoder = FewShotEpisoder(imageset, chosen_classes, K_SHOT, N_QUERY, transform)
+  seen_classes = random.sample(list(imageset.class_to_idx.values()), N_WAY)
+  episoder = FewShotEpisoder(imageset, seen_classes, K_SHOT, N_QUERY, transform)
 
   # initiate model
   model = MAML(*model_config).to(device)
   # train algorithms
   progress_bar, whole_loss = tqdm(range(epochs)), 0.
   criterion, optim = nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=beta)
+  tasks, query_set = episoder.get_episode()  # create support/query set for this episode
   for _ in progress_bar:
-    tasks, query_set = episoder.get_episode()  # create support/query set for this episode
     fast_adaptions = list()
     for task in tasks: fast_adaptions.append(model.inner_update(task, device))  # inner loop
     loss = float()
@@ -58,7 +58,7 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
     "state": model.state_dict(),
     "model_config": model_config,
     "transform": transform,
-    "chosen_classes": chosen_classes,
+    "seen_classes": seen_classes,
     "framework": (N_WAY, K_SHOT, N_QUERY)
   }  # features
   torch.save(features, SAVE_TO)
