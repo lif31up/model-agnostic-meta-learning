@@ -30,13 +30,16 @@ class FewShotEpisoder:
     self.dataset, self.classes = dataset, classes
     self.transform = transform
     self.k_shot, self.n_query = k_shot, n_query
-    self.indices_t = self.get_task_indices()
+    self.indices_t = self.get_indices_t()
   # __init__()
 
-  def get_task_indices(self):
+  def get_indices_t(self):
     indices_t = {label: [] for label in self.classes}
     for index, (_, label) in enumerate(self.dataset):
       if label in self.classes: indices_t[label].append(index)
+    # for
+    for label, _indices_t in indices_t.items():
+      indices_t[label] = random.sample(_indices_t, self.k_shot + self.n_query)
     return indices_t
   # get_task_indices
 
