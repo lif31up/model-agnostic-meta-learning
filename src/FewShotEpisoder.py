@@ -41,6 +41,8 @@ class FewShotEpisoder:
   # get_task_indices
 
   def get_episode(self):
+    """ Get elements of episode
+    Returns: tuple of support FewShotDataset and query FewShotDataset. """
     tasks, query_set = list(), list()
     for indices_t in self.indices_t.values():
       indices_t = random.sample(indices_t, self.k_shot + self.n_query)
