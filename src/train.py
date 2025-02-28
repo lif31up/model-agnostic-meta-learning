@@ -43,18 +43,19 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
     loss = float()
     # outer loop
     for feature, label in DataLoader(query_set, shuffle=True):
+      q_loss = 0.
       for fast_adaption in fast_adaptions:
-        pred = model._forward(feature, fast_adaption)
-        loss += criterion(pred, label)
-    # for for
-
-    # update global parameters
-    loss /= N_WAY
+        pred = model.forward(feature, fast_adaption)
+        q_loss += criterion(pred, label)
+      # for
+      q_loss /= len(fast_adaptions)
+      loss += q_loss
+    # for
+    loss /= len(qeury_set)
     optim.zero_grad()
     loss.backward()
     optim.step()
 
-    # print loss
     progress_bar.set_postfix(loss=loss.item())
     whole_loss += loss.item()
   # for
