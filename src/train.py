@@ -51,7 +51,7 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
       q_loss /= len(fast_adaptions)
       loss += q_loss
     # for
-    loss /= len(qeury_set)
+    loss /= len(query_set)
     optim.zero_grad()
     loss.backward()
     optim.step()

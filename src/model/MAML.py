@@ -34,6 +34,7 @@ class MAML(nn.Module):
         loss = nn.MSELoss()(pred, label)
         grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
         local_params = {name: param - (self.alpha * grad) for (name, param), grad in zip(local_params.items(), grads)}
+    # for for
     return local_params
   # inner_update()
 # MAMLNet
