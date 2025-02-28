@@ -1,10 +1,10 @@
 HYPERPARAMETER_CONFIG = {
-  "alpha": 0.001,
+  "alpha": 0.0001,
   "beta": 0.001
 } # HYPERPARAMETER_CONFIG
 TRAINING_CONFIG = {
-  "iters": 20,
-  "epochs": 50,
+  "iters": 10,
+  "epochs": 15,
 } # TRAINING_CONFIG
 MODEL_CONFIG = {
   "n_inpt": 3,

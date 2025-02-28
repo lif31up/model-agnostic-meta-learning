@@ -34,9 +34,9 @@ class FewShotEpisoder:
   # __init__()
 
   def get_indices_t(self):
-    indices_t = {label: [] for label in self.classes}
+    indices_t = {label: [] for label in range(self.classes.__len__())}
     for index, (_, label) in enumerate(self.dataset):
-      if label in self.classes: indices_t[label].append(index)
+      if label in self.classes: indices_t[self.classes.index(label)].append(index)
     # for
     for label, _indices_t in indices_t.items():
       indices_t[label] = random.sample(_indices_t, self.k_shot + self.n_query)
