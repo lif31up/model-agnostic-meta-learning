@@ -44,7 +44,7 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
     # outer loop
     for feature, label in DataLoader(query_set, shuffle=True):
       for fast_adaption in fast_adaptions:
-        pred = model._forward(feature, fast_adaption)
+        pred = model.forward(feature, fast_adaption)
         loss += criterion(pred, label)
     # for for
 
