@@ -14,18 +14,8 @@ class MAML(nn.Module):
     self.epochs, self.alpha = config
   # __init__
 
-  def forward(self, x):
-    x = self.conv1(x)
-    x = self.relu(x)
-    x = self.conv2(x)
-    x = self.relu(x)
-    x = self.pool(x)
-    x = self.flatten(x)
-    x = self.l1(x)
-    return self.softmax(x)
-  # forward
-
-  def _forward(self, x, params):
+  def forward(self, x, params=None):
+    if not params: params = dict(self.named_parameters())
     x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
     x = F.relu(x)
     x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
@@ -40,7 +30,7 @@ class MAML(nn.Module):
     local_params = {name: param.clone() for name, param in self.named_parameters()}
     for _ in range(self.epochs):
       for feature, label in DataLoader(task, shuffle=True):
-        pred = self._forward(feature, local_params)
+        pred = self.forward(feature, local_params)
         loss = nn.MSELoss()(pred, label)
         grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
         local_params = {name: param - (self.alpha * grad) for (name, param), grad in zip(local_params.items(), grads)}
