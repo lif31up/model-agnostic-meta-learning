@@ -22,6 +22,7 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
     tv.transforms.ToTensor(),
     tv.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
   ])  # transform
+
   # create FewShotEpisoder which creates tuple of (support set, query set)
   imageset = tv.datasets.ImageFolder(root=DATASET)  # load dataset
   seen_classes = random.sample(list(imageset.class_to_idx.values()), N_WAY)
@@ -29,7 +30,8 @@ def train(DATASET: str, SAVE_TO: str, N_WAY: int, K_SHOT: int, N_QUERY: int):
 
   # initiate model
   model = MAML(*model_config).to(device)
-  # train algorithms
+
+  # META TRAINING PHASE
   progress_bar, whole_loss = tqdm(range(epochs)), 0.
   criterion, optim = nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=beta)
   tasks, query_set = episoder.get_episode()  # create support/query set for this episode
