@@ -27,7 +27,7 @@ def evaluate(MODEL: str, DATASET: str):
   # fast adaption(inner loop)
   (tasks, query_set), adaptions = episoder.get_episode(), list()
   for task in tasks: adaptions.append(model.inner_update(task))
-
+  
   # evaluate
   count, n_problem = 0, len(query_set)
   for feature, label in DataLoader(query_set, shuffle=True):
