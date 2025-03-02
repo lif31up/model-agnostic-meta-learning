@@ -9,7 +9,7 @@ class MAML(nn.Module):
     self.conv1 = nn.Conv2d(inpt_channels, hidn_channels, kernel_size=3, padding=1, stride=1)
     self.conv2 = nn.Conv2d(hidn_channels, hidn_channels, kernel_size=3, padding=1, stride=1)
     self.pool = nn.MaxPool2d(3)
-    self.l1 = nn.Linear(in_features=49284, out_features=oupt_channels)
+    self.l1 = nn.Linear(in_features=32856, out_features=oupt_channels)
     self.relu, self.flatten, self.softmax = nn.ReLU(), nn.Flatten(), nn.Softmax(dim=0)
     self.epochs, self.alpha = config
   # __init__
