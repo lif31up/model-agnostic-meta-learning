@@ -44,7 +44,7 @@ python run.py train --dataset_path path/to/your/dataset --save_to /path/to/save/
 
 ### Evaluation
 ```Shell
-python run.py --path path/to/your/dataset --model path/to/saved/model.pth --n_way 5
+python run.py --dataset path/to/your/dataset --model path/to/saved/model.pth --n_way 5
 # output example:
 # seen classes: [10, 11, 18, 1, 3]
 # unseen classes: [19, 1, 4, 2, 13]

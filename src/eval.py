@@ -6,7 +6,7 @@ from src.FewShotEpisoder import FewShotEpisoder
 from src.model.MAML import MAML
 
 def evaluate(MODEL: str, DATASET: str):
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # locate device
 
   # load model
   data = torch.load(MODEL)
