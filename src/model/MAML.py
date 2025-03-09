@@ -21,7 +21,7 @@ class MAML(nn.Module):
     x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
     x = F.relu(x)
     x = F.max_pool2d(x, kernel_size=3)
-    x = x.flatten()
+    x = x.flatten(1)
     x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
     return F.softmax(x)
   # _forward
@@ -30,6 +30,7 @@ class MAML(nn.Module):
     local_params = {name: param.clone() for name, param in self.named_parameters()}
     for _ in range(self.epochs):
       for feature, label in DataLoader(task, shuffle=True):
+        feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
         pred = self.forward(feature, local_params)
         loss = nn.MSELoss()(pred, label)
         grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)

@@ -14,15 +14,9 @@ def main():
   parser_train = subparser.add_parser("train", help="train your model")
   parser_train.add_argument("--dataset", type=str, help="path to your dataset")
   parser_train.add_argument("--save_to", type=str, help="path to save your model")
-  parser_train.add_argument("--n_way", type=int, help="number of classes per episode")
-  parser_train.add_argument("--k_shot", type=int, help="number of support samples per class")
-  parser_train.add_argument("--n_query", type=int, help="number of query samples per class")
   parser_train.set_defaults(func=lambda kwargs: train(
     DATASET=kwargs.dataset,
-    SAVE_TO=kwargs.save_to,
-    N_WAY=kwargs.n_way,
-    K_SHOT=kwargs.k_shot,
-    N_QUERY=kwargs.n_query)
+    SAVE_TO=kwargs.save_to)
   ) # parser_train.set_defaults()
 
   # download dataset
