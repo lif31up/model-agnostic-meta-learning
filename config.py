@@ -1,13 +1,4 @@
-HYPERPARAMETER_CONFIG = {
-  "alpha": 0.001,
-  "beta": 0.0001
-} # HYPERPARAMETER_CONFIG
-TRAINING_CONFIG = {
-  "iters": 10,
-  "epochs": 50,
-} # TRAINING_CONFIG
-MODEL_CONFIG = {
-  "n_inpt": 3,
-  "n_hidn": 6,
-  "n_oupt": 5
-} # MODEL_CONFIG
+FRAMEWORK = { "n_way": 5, "k_shot": 5, "n_query": 2 }
+HYPER_PARAMETERS = { "alpha": 0.01, "beta": 0.0001 }
+TRAINING_CONFIG = { "iters": 5, "epochs": 10, "batch_size": 8 }
+MODEL_CONFIG = { "in_channels": 3, "hidden_channels": 6, "output_channels": 5 } # change number of params this location: MAML.py(12 line)
