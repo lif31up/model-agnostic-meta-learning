@@ -44,7 +44,7 @@ python run.py train --dataset_path path/to/your/dataset --save_to /path/to/save/
 
 ### Evaluation
 ```Shell
-python run.py --dataset path/to/your/dataset --model path/to/saved/model.pth --n_way 5
+python run.py --dataset path/to/your/dataset --model path/to/saved/5w5s.pth --n_way 5
 # output example:
 # seen classes: [10, 11, 18, 1, 3]
 # unseen classes: [19, 1, 4, 2, 13]
@@ -67,3 +67,8 @@ pyhton download --path ./somewhre/your/dataset/
 * **Inner-Loop Optimization:** For each task, the model is fine-tuned on a small support set using a few gradient steps to minimize task-specific loss.
 * **Meta-Update (Outer Loop):** After task-specific updates, gradients are computed based on query set performance, and the initial model parameters are updated to improve adaptability across tasks.
 * **Optimization:** The model is trained using second-order gradient updates (or first-order approximations) to optimize for fast adaptation while maintaining generalization ability.
+
+
+|             | 5 Way ACC (5 shot)   | 5 Way ACC(1 shot)  |
+|-------------|----------------------|--------------------|
+| **Omniglot** | `100%` **(100/100)** | `96%` **(96/100)** |
