@@ -67,7 +67,7 @@ def train(DATASET: str, SAVE_TO: str):
     "seen_classes": seen_classes
   }  # feature
   torch.save(features, SAVE_TO)
-  save_file(model.state_dict(), "MAML.safetensors")
+  save_file(model.state_dict(), SAVE_TO.replace(".pth", ".safetensors"))
 # main
 
-if __name__ == "__main__": train(DATASET="../data/omniglot-py/images_background/Futurama", SAVE_TO="./model/model.pth")
+if __name__ == "__main__": train(DATASET="../data/omniglot-py/images_background/Futurama", SAVE_TO="./model/5w1s.pth")
