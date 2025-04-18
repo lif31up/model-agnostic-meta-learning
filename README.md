@@ -68,6 +68,8 @@ pyhton download --path ./somewhre/your/dataset/
 * **Meta-Update (Outer Loop):** After task-specific updates, gradients are computed based on query set performance, and the initial model parameters are updated to improve adaptability across tasks.
 * **Optimization:** The model is trained using second-order gradient updates (or first-order approximations) to optimize for fast adaptation while maintaining generalization ability.
 
+---
+### Result
 
 |             | 5 Way ACC (5 shot)   | 5 Way ACC(1 shot)  |
 |-------------|----------------------|--------------------|
