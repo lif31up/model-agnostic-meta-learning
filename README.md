@@ -31,7 +31,7 @@ dataset/
 ### Training
 Run the training script with desired parameters:
 ```Shell
-python run.py train --dataset_path path/to/your/dataset --save_to /path/to/save/model --n_way 5 --k_shot 2 --n_query 4 --epochs 1 --iters 4
+python run.py train --dataset path/to/your/dataset --save_to /path/to/save/model --n_way 5 --k_shot 2 --n_query 4 --epochs 1 --iters 4
 ```
 * `path`: Path to your dataset.
 * `save_to`: path to save the trained model.
