@@ -47,6 +47,7 @@ def evaluate(MODEL: str, DATASET: str):
 
 def evaluates(MODEL: str, DATASET: str):
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  print(f"the device type of {device.type}.")
 
   # load model
   data = torch.load(MODEL)
