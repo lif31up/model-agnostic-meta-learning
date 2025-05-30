@@ -32,12 +32,12 @@ def train(DATASET: str, SAVE_TO: str):
 
   # initiate model
   model = MAML(*model_config).to(device)
-  criterion, optim = nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=beta)
+  criterion, optim = nn.CrossEntropyLoss(), torch.optim.Adam(model.parameters(), lr=beta)
 
   # META TRAINING PHASE
   progress_bar, whole_loss = tqdm(range(epochs)), 0.
-  tasks, query_set = episoder.get_episode()
   for _ in progress_bar:
+    tasks, query_set = episoder.get_episode()
     # inner loop: initiate local params and adapt them using `support set` which is seen class.
     local_params = list()
     for task in tasks: local_params.append(model.inner_update(task, device))
