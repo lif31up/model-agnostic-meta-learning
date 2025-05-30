@@ -12,6 +12,7 @@ from safetensors.torch import save_file
 def train(DATASET: str, SAVE_TO: str):
   # overall configuration
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  print(f"the device type is {device.type}")
   n_way, k_shot, n_query = FRAMEWORK["n_way"], FRAMEWORK["k_shot"], FRAMEWORK["n_query"]
   iters, epochs, batch_size = TRAINING_CONFIG["iters"], TRAINING_CONFIG["epochs"], TRAINING_CONFIG["batch_size"]
   alpha, beta = HYPER_PARAMETERS["alpha"], HYPER_PARAMETERS["beta"]
@@ -31,12 +32,12 @@ def train(DATASET: str, SAVE_TO: str):
 
   # initiate model
   model = MAML(*model_config).to(device)
-  criterion, optim = nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=beta)
+  criterion, optim = nn.CrossEntropyLoss(), torch.optim.Adam(model.parameters(), lr=beta)
 
   # META TRAINING PHASE
   progress_bar, whole_loss = tqdm(range(epochs)), 0.
-  tasks, query_set = episoder.get_episode()
   for _ in progress_bar:
+    tasks, query_set = episoder.get_episode()
     # inner loop: initiate local params and adapt them using `support set` which is seen class.
     local_params = list()
     for task in tasks: local_params.append(model.inner_update(task, device))
@@ -58,7 +59,7 @@ def train(DATASET: str, SAVE_TO: str):
 
   # saving model
   features = {
-    "sate": model.state_dict(),
+    "state": model.state_dict(),
     "FRAMEWORK": FRAMEWORK,
     "MODEL_CONFIG": MODEL_CONFIG,
     "HYPER_PARAMETERS": HYPER_PARAMETERS,
