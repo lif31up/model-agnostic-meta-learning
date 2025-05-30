@@ -15,7 +15,7 @@ def evaluate(MODEL: str, DATASET: str):
   data["MODEL_CONFIG"]["in_channels"], data["MODEL_CONFIG"]["hidden_channels"], data["MODEL_CONFIG"]["output_channels"],
   (15, data["HYPER_PARAMETERS"]["alpha"]))
   model = MAML(*model_config).to(device)
-  model.load_state_dict(data["sate"])
+  model.load_state_dict(data["state"])
 
   # overall configuration
   n_way, k_shot, n_query = data["FRAMEWORK"].values()
@@ -53,7 +53,7 @@ def evaluates(MODEL: str, DATASET: str):
   data = torch.load(MODEL)
   model_config = (data["MODEL_CONFIG"]["in_channels"], data["MODEL_CONFIG"]["hidden_channels"], data["MODEL_CONFIG"]["output_channels"], (15, data["HYPER_PARAMETERS"]["alpha"]))
   model = MAML(*model_config).to(device)
-  model.load_state_dict(data["sate"])
+  model.load_state_dict(data["state"])
 
   # overall configuration
   n_way, k_shot, n_query = data["FRAMEWORK"].values()

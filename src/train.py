@@ -59,7 +59,7 @@ def train(DATASET: str, SAVE_TO: str):
 
   # saving model
   features = {
-    "sate": model.state_dict(),
+    "state": model.state_dict(),
     "FRAMEWORK": FRAMEWORK,
     "MODEL_CONFIG": MODEL_CONFIG,
     "HYPER_PARAMETERS": HYPER_PARAMETERS,
