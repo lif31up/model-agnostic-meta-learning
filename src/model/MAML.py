@@ -17,9 +17,9 @@ class MAML(nn.Module):
   def forward(self, x, params=None):
     if not params: params = dict(self.named_parameters())
     x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
-    x = F.selu(x)
+    x = F.silu(x)
     x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
-    x = F.selu(x)
+    x = F.silu(x)
     x = F.max_pool2d(x, kernel_size=3)
     x = x.flatten(1)
     x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
