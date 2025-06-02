@@ -10,16 +10,16 @@ class MAML(nn.Module):
     self.conv2 = nn.Conv2d(hidn_channels, hidn_channels, kernel_size=3, padding=1, stride=1)
     self.pool = nn.MaxPool2d(3)
     self.l1 = nn.Linear(in_features=32856, out_features=oupt_channels)
-    self.relu, self.flatten, self.softmax = nn.ReLU(), nn.Flatten(), nn.Softmax(dim=0)
+    self.swish, self.flatten, self.softmax = nn.SiLU(), nn.Flatten(), nn.Softmax(dim=0)
     self.epochs, self.alpha = config
   # __init__
 
   def forward(self, x, params=None):
     if not params: params = dict(self.named_parameters())
     x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
-    x = F.relu(x)
+    x = F.selu(x)
     x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
-    x = F.relu(x)
+    x = F.selu(x)
     x = F.max_pool2d(x, kernel_size=3)
     x = x.flatten(1)
     x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
