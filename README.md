@@ -5,7 +5,7 @@ This implementation is inspired by **"Model-Agnostic Meta-Learning for Fast Adap
 * **dataset**: downloaded from `torch` dataset library.
 
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
-This repository implements a Model-Agnostic Meta-Learning (MAML) algorithm for few-shot image classification tasks using PyTorch. MAML is designed to address the challenge of adapting to new tasks with limited examples by learning an initialization that enables fast adaptation with minimal gradient steps.
+This repository implements a Model-Agnostic Meta-Learning (MAML) algorithm for few-shot image classification tasks using PyTorch.
 
 Few-shot learning focuses on enabling models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing for a set of parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data.
 
