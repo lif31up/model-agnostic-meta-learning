@@ -23,7 +23,7 @@ class MAML(nn.Module):
     x = F.max_pool2d(x, kernel_size=3)
     x = x.flatten(1)
     x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
-    return F.softmax(x)
+    return F.softmax(x, dim=1)
   # _forward
 
   def inner_update(self, task, device=None):
