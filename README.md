@@ -13,6 +13,8 @@ Few-shot learning focuses on enabling models to generalize to new tasks with onl
 
 > You can access the test result on colab here: [colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018#scrollTo=iMjrWpR0FxHn)
 
+> Safetensor on [huggingface](https://huggingface.co/lif31up/model-agnostic-meta-learning)
+
 ## Instruction
 Organize your dataset into a structure compatible with PyTorch's ImageFolder:
 ```
