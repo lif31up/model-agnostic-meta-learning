@@ -1,4 +1,18 @@
-FRAMEWORK = { "n_way": 5, "k_shot": 1, "n_query": 2 }
-HYPER_PARAMETERS = { "alpha": 0.01, "beta": 0.0001 }
-TRAINING_CONFIG = { "iters": 5, "epochs": 10, "batch_size": 8 }
-MODEL_CONFIG = { "in_channels": 3, "hidden_channels": 6, "output_channels": 5 } # change number of params this location: MAML.py(12 line)
+CONFIG = {
+  "version": "1.0.1",
+  # framework
+  "n_way": 5,
+  "k_shot": 1,
+  "n_query": 2,
+  # model
+  "inpt_dim": 3,
+  "hidn_dim": 6,
+  "oupt_dim": 5,
+  # hp
+  "iters": 5,
+  "epochs": 10,
+  "batch_size": 8,
+  "inner_batch_size": 5,
+  "alpha": 1e-2,
+  "beta": 1e-4,
+} # CONFIG
