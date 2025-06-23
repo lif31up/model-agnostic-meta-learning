@@ -14,51 +14,50 @@ This repository implements a Model-Agnostic Meta-Learning (MAML) algorithm for f
 
 Few-shot learning focuses on enabling models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing for a set of parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data.
 
-* **Inner-Loop Optimization:** For each task, the model is fine-tuned on a small support set using a few gradient steps to minimize task-specific loss.
+* **Inner-Loop Fast Adaption:** For each task, the model is fine-tuned on a small support set using a few gradient steps to minimize task-specific loss.
 * **Meta-Update (Outer Loop):** After task-specific updates, gradients are computed based on query set performance, and the initial model parameters are updated to improve adaptability across tasks.
 
 ---
+### Configuration
+confing.py contains the configuration settings for the model, including the framework, dimensions, learning rate, and other hyperparameters
+```python
+CONFIG = {
+  "version": "1.0.1",
+  # framework
+  "n_way": 5,
+  "k_shot": 1,
+  "n_query": 2,
+  # model
+  "inpt_dim": 3,
+  "hidn_dim": 6,
+  "oupt_dim": 5,
+  # hp
+  "iters": 5,
+  "epochs": 10,
+  "batch_size": 8,
+  "inner_batch_size": 5,
+  "alpha": 1e-2,
+  "beta": 1e-4,
+} # CONFIG
+```
 ### Training
-Run the training script with desired parameters:
-```Shell
-python run.py train --dataset path/to/your/dataset --save_to /path/to/save/model --n_way 5 --k_shot 2 --n_query 4 --epochs 1 --iters 4
+train.py is a script to train the model on the omniglot dataset. It includes the training loop, evaluation, and saving the model checkpoints.
+```python
+if __name__ == "__main__":
+  from datasets import load_dataset
+
+  dataset = load_dataset('imdb')['train'].shuffle(seed=42).select(range(100))
+  train(dataset, config=CONFIG, SAVE_TO="BERT")  # Replace with the actual model path
+# __name__
 ```
-* `path`: Path to your dataset.
-* `save_to`: path to save the trained model.
-* `n_way`: number of classes in each episode.
-* `k_shot`: Number of support samples per class.
-* `n-_query`: Number of query samples per class.
-
-> change training configuration from `config.py`
-
-
 ### Evaluation
-```Shell
-python run.py --dataset path/to/your/dataset --model path/to/saved/5w5s.pth --n_way 5
-# output example:
-# seen classes: [10, 11, 18, 1, 3]
-# unseen classes: [19, 1, 4, 2, 13]
-# accuracy: 1.0000(10/10)
-```
-* `model`: Path to your model.
-* `dataset`: Path to your dataset.
+eval.py is used to evaluate the trained model on the omniglot dataset. It loads the model and tokenizer, processes the dataset, and computes the accuracy of the model.
+```python
+if __name__ == "__main__":
+  from datasets import load_dataset
 
-### Download Omniglot Dataset
-```Shell
-pyhton download --path ./somewhre/your/dataset/
+  dataset = load_dataset('imdb')['train'].shuffle(seed=42).select(range(100))
+  evaluate("BERT.pth", dataset)  # Replace with the actual model path
+# __name__
+## output example: accuracy: 0.91
 ```
-* `path`: Path to your dataset.
-
-You can use custom dataset into a structure compatible with PyTorch's ImageFolder:
-```
-dataset/
-  ├── class1/
-  │   ├── img1.jpg
-  │   ├── img2.jpg
-  │   └── ...
-  ├── class2/
-  │   ├── img1.jpg
-  │   ├── img2.jpg
-  │   └── ...
-  └── ...
- ```
