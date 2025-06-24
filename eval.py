@@ -3,8 +3,8 @@ import torch
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 import torchvision as tv
-from src.FewShotEpisoder import FewShotEpisoder
-from src.model.MAML import MAML
+from FewShotEpisoder import FewShotEpisoder
+from model.MAML import MAML
 
 def evaluate(MODEL: str, DATASET: str):
   # load a model

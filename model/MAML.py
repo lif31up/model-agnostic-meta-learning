@@ -48,7 +48,7 @@ class MAML(nn.Module):
 if __name__ == "__main__":
   from config import CONFIG
   import torchvision as tv
-  from src.FewShotEpisoder import FewShotEpisoder
+  from FewShotEpisoder import FewShotEpisoder
 
   transform = tv.transforms.Compose([
     tv.transforms.Resize((222, 222)),

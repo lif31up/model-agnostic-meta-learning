@@ -61,3 +61,51 @@ if __name__ == "__main__":
 # __name__
 ## output example: accuracy: 0.91
 ```
+---
+## Technical Highlights
+
+### Inner Loop
+```python
+def inner_update(self, task):
+  local_params = {name: param.clone() for name, param in self.named_parameters()}
+  for _ in range(self.epochs):
+    for feature, label in DataLoader(task, batch_size=self.batch_size, shuffle=True, num_workers=4, pin_memory=True):
+      feature, label = feature.to(self.device, non_blocking=True), label.to(self.device, non_blocking=True)
+      pred = self.forward(feature, local_params)
+      loss = nn.MSELoss()(pred, label)
+      grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
+      local_params = {name: param - (self.alpha * grad) for (name, param), grad in zip(local_params.items(), grads)}
+  # for for
+  return local_params
+# inner_update()
+```
+### Outer Loop
+
+
+```python
+tasks, query_set = episoder.get_episode()
+local_params = list()
+for task in tasks: local_params.append(maml.inner_update(task))
+for feature, label in DataLoader(query_set, batch_size=CONFIG["batch_size"], shuffle=True, pin_memory=True, num_workers=4):
+  feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
+  for local_param in local_params:
+    pred = maml.forward(feature, local_param)
+    print(f"pred shape: {pred.shape} feature shape: {feature.shape} label shape: {label.shape}")
+  # for
+  break
+# for
+```
+
+### Forward
+```python
+def forward(self, x, params=None):
+  if not params: params = dict(self.named_parameters())
+  x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
+  x = self.swish(x)
+  x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
+  x = self.pool(x)
+  x = self.flatten(x)
+  x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
+  return self.softmax(x)
+# forward()
+```

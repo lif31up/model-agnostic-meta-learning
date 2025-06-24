@@ -3,8 +3,8 @@ import torchvision as tv
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch import nn
-from src.model.MAML import MAML
-from src.FewShotEpisoder import FewShotEpisoder
+from model.MAML import MAML
+from FewShotEpisoder import FewShotEpisoder
 import random
 from safetensors.torch import save_file
 
@@ -54,12 +54,12 @@ def train(DATASET, SAVE_TO, config):
     "state": model.state_dict(),
     "config": config
   }  # feature
-  torch.save(features, SAVE_TO)
-  save_file(model.state_dict(), SAVE_TO.replace(".pth", ".safetensors"))
+  torch.save(features, SAVE_TO + ".pth")
+  save_file(model.state_dict(), SAVE_TO + ".safetensors")
 # main
 
 if __name__ == "__main__":
   from config import CONFIG
 
-  train(DATASET="../data/omniglot-py/images_background/Futurama", SAVE_TO="./model/5w1s.pth", config=CONFIG)
+  train(DATASET="../data/omniglot-py/images_background/Futurama", SAVE_TO="./model/5w1s", config=CONFIG)
 # if __name__ == "__main__":
