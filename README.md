@@ -44,22 +44,19 @@ CONFIG = {
 train.py is a script to train the model on the omniglot dataset. It includes the training loop, evaluation, and saving the model checkpoints.
 ```python
 if __name__ == "__main__":
-  from datasets import load_dataset
+  from config import CONFIG
 
-  dataset = load_dataset('imdb')['train'].shuffle(seed=42).select(range(100))
-  train(dataset, config=CONFIG, SAVE_TO="BERT")  # Replace with the actual model path
-# __name__
+  train(DATASET="../data/omniglot-py/images_background/Futurama", SAVE_TO="./model/5w1s", config=CONFIG)
+# if __name__ == "__main__":
 ```
 ### Evaluation
 eval.py is used to evaluate the trained model on the omniglot dataset. It loads the model and tokenizer, processes the dataset, and computes the accuracy of the model.
 ```python
-if __name__ == "__main__":
-  from datasets import load_dataset
-
-  dataset = load_dataset('imdb')['train'].shuffle(seed=42).select(range(100))
-  evaluate("BERT.pth", dataset)  # Replace with the actual model path
-# __name__
-## output example: accuracy: 0.91
+if __name__ == "__main__": evaluate("./model/5w1s.pth", "../data/omniglot-py/images_background/Futurama")
+# output example:
+# seen classes: [1, 15, 6, 20, 12]
+# unseen classes: [22, 3, 16, 20, 18]
+# accuracy: 0.9000(9/10)
 ```
 ---
 ## Technical Highlights
