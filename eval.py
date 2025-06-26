@@ -6,7 +6,7 @@ import torchvision as tv
 from FewShotEpisoder import FewShotEpisoder
 from model.MAML import MAML
 
-def evaluate(MODEL: str, DATASET: str):
+def evaluate(MODEL, DATASET):
   # load a model
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   data = torch.load(MODEL)["state"]
