@@ -28,7 +28,7 @@ def evaluate(MODEL: str, DATASET: str):
   evisoder = FewShotEpisoder(imageset, unseen_classes, config["k_shot"], config["n_query"], transform)
 
   # fast adaption using inner loop
-  accuracy, count, n_problem = 0., 0, 0
+  accuracy, n_corrects, n_samples = float(0), int(0), int(0)
   (tasks, query_set), adaptions = evisoder.get_episode(), list()
   for task in tqdm(tasks, desc="adaption"): adaptions.append(model.inner_update(task, device))
 
@@ -37,11 +37,11 @@ def evaluate(MODEL: str, DATASET: str):
     feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
     task_i = torch.argmax(label).item()
     pred = model.forward(feature, adaptions[task_i])
-    if torch.argmax(pred) == torch.argmax(label): count += 1
-    n_problem += 1
+    if torch.argmax(pred) == torch.argmax(label): n_corrects += 1
+    n_samples += 1
   # for
 
-  print(f"seen classes: {data['seen_classes']}\nunseen classes: {unseen_classes}\naccuracy: {count / n_problem:.4f}({count}/{n_problem})")
+  print(f"seen classes: {data['seen_classes']}\nunseen classes: {unseen_classes}\naccuracy: {n_corrects / n_samples:.4f}({n_corrects}/{n_samples})")
 # evaluate
 
 if __name__ == "__main__": evaluate("./model/5w1s.pth", "../data/omniglot-py/images_background/Futurama")
