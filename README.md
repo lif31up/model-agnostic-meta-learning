@@ -60,9 +60,11 @@ if __name__ == "__main__": evaluate("./model/5w1s.pth", "../data/omniglot-py/ima
 ```
 ---
 ## Technical Highlights
-
+Although MAML is one of the most prominent few-shot learning algorithms, it's mathematically complex even compared to other modern deep learning approaches. Both the learning and evaluation processes consist of two stages.
 
 ### Inner Loop
+The inner loop is the first stage of MAML's algorithm where task-specific adaptations occur. It involves taking a small number of examples (support set) from a new task and creating parameters for each task. It then performs gradient updates to quickly adapt the model parameters for that specific task.
+
 ```python
 def inner_update(self, task):
   local_params = {name: param.clone() for name, param in self.named_parameters()}
@@ -78,7 +80,7 @@ def inner_update(self, task):
 # inner_update()
 ```
 ### Outer Loop
-
+The outer-loop is the second stage of MAML's algorithm where meta-learning occurs. It optimizes the initial model parameters to ensure they can be quickly adapted to new tasks with minimal data. This stage uses performance on the query set to update the model's starting point.
 
 ```python
 tasks, query_set = episoder.get_episode()
@@ -95,6 +97,8 @@ for feature, label in DataLoader(query_set, batch_size=CONFIG["batch_size"], shu
 ```
 
 ### Forward
+The forward process in MAML differs significantly from other deep neural networks. First, it adapts to tasks from the query set. Then, it forwards each parameter per task and calculates probabilities.
+
 ```python
 def forward(self, x, params=None):
   if not params: params = dict(self.named_parameters())
