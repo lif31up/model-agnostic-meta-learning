@@ -10,8 +10,8 @@ def evaluate(MODEL, DATASET):
   # load a model
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   data = torch.load(MODEL)["state"]
-  state, config = data["state"], data["config"]
-  model = MAML(config).to(device)
+  state, MODEL_CONFIG, TRAINING_CONFIG, FRAMEWORK = data["state"], data["MODEL_CONFIG"], data["TRAINING_CONFIG"], data["FRAMEWORK"]
+  model = MAML(MODEL_CONFIG).to(device)
   model.load_state_dict(state)
   model.eval()
 
@@ -24,13 +24,13 @@ def evaluate(MODEL, DATASET):
 
   # create FewShotEpisoder which creates tuple of (support set, query set)
   imageset = tv.datasets.ImageFolder(root=DATASET)
-  unseen_classes = random.sample(list(imageset.class_to_idx.values()), config["n_way"])
-  evisoder = FewShotEpisoder(imageset, unseen_classes, config["k_shot"], config["n_query"], transform)
+  unseen_classes = random.sample(list(imageset.class_to_idx.values()), FRAMEWORK["n_way"])
+  evisoder = FewShotEpisoder(imageset, unseen_classes, FRAMEWORK["k_shot"], FRAMEWORK["n_query"], transform)
 
   # fast adaption using inner loop
   accuracy, n_corrects, n_samples = float(0), int(0), int(0)
   (tasks, query_set), adaptions = evisoder.get_episode(), list()
-  for task in tqdm(tasks, desc="adaption"): adaptions.append(model.inner_update(task, device))
+  for task in tqdm(tasks, desc="adaption"): adaptions.append(model.inner_update(task=task, config=TRAINING_CONFIG, device=device))
 
   # meta validation phase
   for feature, label in DataLoader(query_set, shuffle=True, num_workers=4, pin_memory=True):
