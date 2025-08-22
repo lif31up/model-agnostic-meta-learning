@@ -7,14 +7,9 @@ from model.MAML import MAML
 from FewShotEpisoder import FewShotEpisoder
 import random
 from safetensors.torch import save_file
+from transform import *
 
 def train(DATASET, SAVE_TO, MODEL_CONFIG, TRAINING_CONFIG, device):
-  transform = tv.transforms.Compose([
-    tv.transforms.Resize((222, 222)),
-    tv.transforms.ToTensor(),
-    tv.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-  ])  # transform
-
   # init a dataset
   imageset = tv.datasets.ImageFolder(root=DATASET)  # load dataset
   FRAMEWORK = {"n_way": 5, "k_shot": 5, "n_query": 2}
@@ -58,9 +53,8 @@ def train(DATASET, SAVE_TO, MODEL_CONFIG, TRAINING_CONFIG, device):
     "FRAMEWORK": FRAMEWORK,
     "MODEL_CONFIG": MODEL_CONFIG,
     "TRAINING_CONFIG": TRAINING_CONFIG,
-    "TRANSFORM": transform
   }  # feature
-  torch.save(features, SAVE_TO + ".pth")
+  torch.save(features, SAVE_TO + ".bin")
   save_file(model.state_dict(), SAVE_TO + ".safetensors")
 # main
 
