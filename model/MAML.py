@@ -7,18 +7,21 @@ class MAML(nn.Module):
   def __init__(self, config):
     super(MAML, self).__init__()
     self.config = config
-    self.conv1 = nn.Conv2d(self.config["input_channels"], self.config["hidden_channels"], kernel_size=self.config["conv:kernel_size"])
-    self.conv2 = nn.Conv2d(self.config["hidden_channels"], self.config["hidden_channels"], kernel_size=self.config["conv:kernel_size"])
-    self.l1 = nn.Linear(in_features=self.config["l1:in_features"], out_features=self.config["output_channels"])
-    self.act, self.flatten, self.pool = nn.SiLU(), nn.Flatten(start_dim=1, end_dim=-1), nn.MaxPool2d(kernel_size=3)
+    self.conv1 = nn.Conv2d(self.config["input_channels"], self.config["hidden_channels"], kernel_size=self.config["conv:kernel_size"], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+    self.conv2 = nn.Conv2d(self.config["hidden_channels"], self.config["hidden_channels"], kernel_size=self.config["conv:kernel_size"], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+    self.conv3 = nn.Conv2d(self.config["hidden_channels"], self.config["hidden_channels"], kernel_size=self.config["conv:kernel_size"], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+    self.pool = nn.MaxPool2d(kernel_size=3)
+    self.act, self.flatten = nn.ReLU(), nn.Flatten(start_dim=1)
+    self.l1 = nn.Linear(in_features=self.config["l1_in_features"], out_features=self.config["output_channels"])
   # __init__
 
   def forward(self, x, params=None):
     if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
     x = F.conv2d(x, weight=params['conv1.weight'], bias=params['conv1.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
-    x = self.act(x)
-    x = F.conv2d(x, weight=params['conv2.weight'], bias=params['conv2.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
-    x = self.act(x)
+    res = x
+    x = F.conv2d(self.act(x) + res, weight=params['conv2.weight'], bias=params['conv2.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+    res = x
+    x = F.conv2d(self.act(x) + res, weight=params['conv3.weight'], bias=params['conv3.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
     x = self.pool(x)
     x = self.flatten(x)
     return F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])

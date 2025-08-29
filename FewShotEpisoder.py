@@ -25,31 +25,39 @@ class FewShotDataset(Dataset):
 # MAMLDataset
 
 class FewShotEpisoder:
-  def __init__(self, dataset, classes: list, k_shot: int, n_query: int, transform:typing.Callable):
+  def __init__(self, dataset, classes, k_shot, n_query, transform, is_val=False):
     assert k_shot > 0 or n_query > 0, ValueError("k_shot and n_query must be greater than 0.")
     self.dataset, self.classes = dataset, classes
     self.transform = transform
     self.k_shot, self.n_query = k_shot, n_query
     self.indices_t = self.get_indices_t()
+    self.is_val = is_val
   # __init__()
 
   def get_indices_t(self):
+    """sort dataset and return their indiceses"""
     indices_t = {label: [] for label in range(self.classes.__len__())}
     for index, (_, label) in enumerate(self.dataset):
       if label in self.classes: indices_t[self.classes.index(label)].append(index)
-    # for
     for label, _indices_t in indices_t.items():
       indices_t[label] = random.sample(_indices_t, self.k_shot + self.n_query)
     return indices_t
   # get_task_indices
 
   def get_episode(self):
-    """ Get elements of episode
-    Returns: tuple of support FewShotDataset and query FewShotDataset. """
+    if self.is_val: return self.get_episode_val()
     tasks, query_set = list(), list()
     for indices_t in self.indices_t.values():
       indices_t = random.sample(indices_t, self.k_shot + self.n_query)
       tasks.append(FewShotDataset(self.dataset, self.classes, indices_t[:self.k_shot], self.transform))
       query_set.extend(indices_t[self.k_shot:])
     return tasks, FewShotDataset(self.dataset, self.classes, query_set, self.transform)
-# MAMLDataset
+
+  def get_episode_val(self):
+    support_set, query_set = list(), list()
+    for indices_t in self.indices_t.values():
+      indices_t = random.sample(indices_t, self.k_shot + self.n_query)
+      support_set.extend(indices_t[:self.k_shot])
+      query_set.extend(indices_t[self.k_shot:])
+    return FewShotDataset(self.dataset, self.classes, support_set, self.transform), FewShotDataset(self.dataset, self.classes, query_set, self.transform)
+# FewShotEpisoder
