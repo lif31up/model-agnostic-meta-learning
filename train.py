@@ -1,12 +1,10 @@
 import torch
-import torchvision as tv
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch import nn
 from model.MAML import MAML
 from FewShotEpisoder import FewShotEpisoder
 import random
-from safetensors.torch import save_file
 from transform import *
 
 def train(model, path, config, episoder, device):
@@ -16,12 +14,10 @@ def train(model, path, config, episoder, device):
 
   progress_bar, whole_loss = tqdm(range(config["epochs"])), 0.
   for _ in progress_bar:
-    # inner loop: init local params, adapt to the task, ueses seen classes in support_set
     tasks, query_set = episoder.get_episode()
     local_params = list()
-    for task in tasks: local_params.append(model.inner_update(task, config, device))
-    # outer loop: update meta/global params, uses seen classes in query_set
-    loss = 0.
+    for task in tasks: local_params.append(model.inner_update(task, config, device)) # inner loop: init local params, adapt to the task, ueses seen classes in support_set
+    loss = 0. # outer loop: update meta/global params, uses seen classes in query_set
     for feature, label in DataLoader(query_set, batch_size=config["epochs:batch_size"], shuffle=True, pin_memory=True, num_workers=4):
       feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
       task_loss = 0.
@@ -29,14 +25,12 @@ def train(model, path, config, episoder, device):
         pred = model.forward(feature, local_param)
         task_loss += criterion(pred, label)
       loss += task_loss / len(local_params) # calculate avg of losses per tasks
-    # uses pytorch auto-grad to update global/meta params
     loss /= len(query_set)
     optim.zero_grad()
     loss.backward()
     optim.step()
     progress_bar.set_postfix(loss=loss.item())
     whole_loss += loss.item()
-  # for _ in progress_bar
 
   features = {
     "sate": model.state_dict(),
@@ -44,7 +38,7 @@ def train(model, path, config, episoder, device):
     "MODEL_CONFIG": MODEL_CONFIG,
     "TRAINING_CONFIG": TRAINING_CONFIG
   } # feature
-  torch.save(features, PATH)
+  torch.save(features, path)
   return 0
 # train()
 
