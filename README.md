@@ -21,42 +21,68 @@ Few-shot learning focuses on enabling models to generalize to new tasks with onl
 ### Configuration
 confing.py contains the configuration settings for the model, including the framework, dimensions, learning rate, and other hyperparameters
 ```python
-CONFIG = {
-  "version": "1.0.1",
-  # framework
-  "n_way": 5,
-  "k_shot": 1,
-  "n_query": 2,
-  # model
-  "inpt_dim": 3,
-  "hidn_dim": 6,
-  "oupt_dim": 5,
-  # hp
-  "iters": 5,
-  "epochs": 10,
-  "batch_size": 8,
-  "inner_batch_size": 5,
-  "alpha": 1e-2,
+MODEL_CONFIG = {
+  "input_channels": 1,
+  "hidden_channels": 32,
+  "output_channels": 5,
+  "conv:kernel_size": 3,
+  "conv:padding": 1,
+  "conv:stride": 1,
+  "l1_in_features": 2592
+} # MODEL_CONFIG
+
+TRAINING_CONFIG = {
+  "iterations": 100,
+  "epochs": 30,
+  "alpha": 1e-3,
   "beta": 1e-4,
-} # CONFIG
+  "iterations:batch_size": 32,
+  "epochs:batch_size": 32,
+} # TRAINING_CONFIG
+
+FRAMEWORK = { "n_way": 5, "k_shot": 1, "n_query": 2 }
 ```
 ### Training
 train.py is a script to train the model on the omniglot dataset. It includes the training loop, evaluation, and saving the model checkpoints.
 ```python
 if __name__ == "__main__":
-  from config import CONFIG
-
-  train(DATASET="../data/omniglot-py/images_background/Futurama", SAVE_TO="./model/5w1s", config=CONFIG)
+  from config import MODEL_CONFIG, TRAINING_CONFIG, FRAMEWORK
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  tv.datasets.Omniglot(root="./data/", background=True, download=True)
+  imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  PATH = "5w.bin"
+  seen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), FRAMEWORK["n_way"])]
+  episoder = FewShotEpisoder(imageset, seen_classes, FRAMEWORK["k_shot"], FRAMEWORK["n_query"], transform)
+  model = MAML(MODEL_CONFIG)
+  train(path=PATH, model=model, config=TRAINING_CONFIG, episoder=episoder, device=device)
 # if __name__ == "__main__":
 ```
 ### Evaluation
 eval.py is used to evaluate the trained model on the omniglot dataset. It loads the model and tokenizer, processes the dataset, and computes the accuracy of the model.
 ```python
-if __name__ == "__main__": evaluate("./model/5w1s.pth", "../data/omniglot-py/images_background/Futurama")
-# output example:
-# seen classes: [1, 15, 6, 20, 12]
-# unseen classes: [22, 3, 16, 20, 18]
-# accuracy: 0.9000(9/10)
+if __name__ == "__main__":
+  tv.datasets.Omniglot(root="./data/", background=True, download=True)
+  imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")
+
+  VAL_CONFIG = {
+    "iterations": 100,
+    "beta": 1e-4,
+    "iterations:batch_size": 32,
+  }  # VALIDATION_CONFIG
+  VAL_FRAMEWORK = {"n_way": 5, "k_shot": 3, "n_query": 10}
+  print(f"Validated Framework: {VAL_FRAMEWORK}")
+
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  my_data = torch.load("/content/drive/MyDrive/Colab Notebooks/MAML.bin", map_location=device, weights_only=False)
+  my_model = MAML(my_data["MODEL_CONFIG"]).to(device)
+  my_model.load_state_dict(my_data["sate"])
+
+  unseen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), my_data["FRAMEWORK"]["n_way"])]
+  evisoder = FewShotEpisoder(imageset, unseen_classes, VAL_FRAMEWORK["k_shot"], VAL_FRAMEWORK["n_query"], transform, True)
+  counts, n_problems = evaluate(my_model, evisoder=evisoder, config=VAL_CONFIG, device=device, logging=True)
+  print(f"unseen classes: {evisoder.classes}\nACC: {(counts / n_problems):.2f}({counts}/{n_problems})")
+# if __name__ == "__main__":
 ```
 ---
 ## Technical Highlights
@@ -101,13 +127,14 @@ The forward process in MAML differs significantly from other deep neural network
 
 ```python
 def forward(self, x, params=None):
-  if not params: params = dict(self.named_parameters())
-  x = F.conv2d(x, params['conv1.weight'], bias=params['conv1.bias'], stride=1, padding=1)
-  x = self.swish(x)
-  x = F.conv2d(x, params['conv2.weight'], bias=params['conv2.bias'], stride=1, padding=1)
+  if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
+  x = F.conv2d(x, weight=params['conv1.weight'], bias=params['conv1.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+  res = x
+  x = F.conv2d(self.act(x) + res, weight=params['conv2.weight'], bias=params['conv2.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+  res = x
+  x = F.conv2d(self.act(x) + res, weight=params['conv3.weight'], bias=params['conv3.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
   x = self.pool(x)
   x = self.flatten(x)
-  x = F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
-  return self.softmax(x)
+  return F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
 # forward()
 ```
