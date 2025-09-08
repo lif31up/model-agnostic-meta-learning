@@ -1,25 +1,27 @@
 This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks"**](https://arxiv.org/abs/1703.05175) (2017) by Jake Snell, Kevin Swersky, Richard S. Zemel.
 * **Note & Reference:** [GitBook](https://lif31up.gitbook.io/lif31up/few-shot-learning/model-agnostic-meta-learning-for-fast-adaptation-of-deep-networks)
-* **Quickstart on Colab:** [Colab]()
+* **Colab Playground:** [Colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
+* **Huggingface:** [Huggingface](https://huggingface.co/lif31up/model-agnostic-meta-learning)
 
-|            | 5 Way ACC (5 shot) | 5 Way ACC(1 shot) |
-|------------|--------------------|------------------|
-|**Omniglot**|`100%` **(100/100)**|`96%` **(96/100)**|
+|            | 5 Way ACC (5 shot)  | 5 Way ACC(1 shot)  |
+|------------|---------------------|--------------------|
+|**Omniglot**| `100%` **(76/100)** | `86%` **(86/100)** |
 
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
-This repository implements a Model-Agnostic Meta-Learning (MAML) algorithm for few-shot image classification tasks using PyTorch.
+The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
+
+![img_1.png](img_1.png)
 
 * **Task**: classifying image with few dataset.
 * **Dataset**: `omniglot futurama`
 
-Few-shot learning focuses on enabling models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing for a set of parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data.
-
-* **Inner-Loop Fast Adaption:** For each task, the model is fine-tuned on a small support set using a few gradient steps to minimize task-specific loss.
-* **Meta-Update (Outer Loop):** After task-specific updates, gradients are computed based on query set performance, and the initial model parameters are updated to improve adaptability across tasks.
+FSL(Few-Shot Learning) focuses on enabling models to generalize to new tasks with only a few labeled examples. 
+MAML achieves this by optimizing for a set of parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data.
 
 ---
 ### Configuration
 confing.py contains the configuration settings for the model, including the framework, dimensions, learning rate, and other hyperparameters
+
 ```python
 MODEL_CONFIG = {
   "input_channels": 1,

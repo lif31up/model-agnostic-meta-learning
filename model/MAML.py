@@ -29,14 +29,14 @@ class MAML(nn.Module):
 
   def inner_update(self, task, config, device=None):
     """it retuns adapted/inner-updated params which associated with given task"""
-    local_params = {name: param.clone() for name, param in self.named_parameters()}  # init local params
+    local_param = {name: param.clone() for name, param in self.named_parameters()}  # init local params
     for _ in range(config["iterations"]): # update local params to the task
       for feature, label in DataLoader(task, batch_size=config["iterations:batch_size"], shuffle=True, pin_memory=True, num_workers=4):
         feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
-        pred = self.forward(feature, local_params)
+        pred = self.forward(feature, local_param)
         loss = nn.MSELoss()(pred, label)
-        grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
-        local_params = {name: param - (config["alpha"] * grad) for (name, param), grad in zip(local_params.items(), grads)}
-    return local_params
+        grads = torch.autograd.grad(loss, list(local_param.values()), create_graph=True)
+        local_param = {name: param - (config["alpha"] * grad) for (name, param), grad in zip(local_param.items(), grads)}
+    return local_param
   # inner_update()
 # MAMLNet
