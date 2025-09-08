@@ -1,6 +1,6 @@
 This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks"**](https://arxiv.org/abs/1703.05175) (2017) by Jake Snell, Kevin Swersky, Richard S. Zemel.
 * **Note & Reference:** [GitBook](https://lif31up.gitbook.io/lif31up/few-shot-learning/model-agnostic-meta-learning-for-fast-adaptation-of-deep-networks)
-* **Colab Playground:** [Colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
+* **⭐ Colab Playground:** [Colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
 * **Huggingface:** [Huggingface](https://huggingface.co/lif31up/model-agnostic-meta-learning)
 
 |            | 5 Way ACC (5 shot)  | 5 Way ACC(1 shot)  |
@@ -10,7 +10,7 @@ This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Ada
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
 The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
 
-![img_1.png](img_1.png)
+![img_1.png](img_0.png)
 
 * **Task**: classifying image with few dataset.
 * **Dataset**: `omniglot futurama`
