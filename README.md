@@ -3,9 +3,9 @@ This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Ada
 * **⭐ Colab Playground:** [Colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
 * **Huggingface:** [Huggingface](https://huggingface.co/lif31up/model-agnostic-meta-learning)
 
-|            | 5 Way ACC (5 shot)  | 5 Way ACC(1 shot)  |
-|------------|---------------------|--------------------|
-|**Omniglot**| `100%` **(76/100)** | `86%` **(86/100)** |
+|            | 5 Way ACC (5 shot) | 5 Way ACC(1 shot) |
+|------------|-------------------|-------------------|
+|**Omniglot**| `76%` **(76/50)** | `86%` **(86/100)** |
 
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
 The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
