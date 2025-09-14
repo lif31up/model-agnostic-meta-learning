@@ -9,6 +9,8 @@ This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Ada
 * `ResNet_MAML`: Residual Network with MAML
 * `ResNet_BOIL`: Residual Network with BOIL
 
+**Results:**
+
 | 5w5s ACC            | CNN_MAML       | CNN_BOIL       | ResNet_MAML    | ResNet_BOIL   |
 |---------------------|----------------|----------------|----------------|---------------|
 | `Omniglot Futurama` | `86% (86/100)` | `83% (83/100)` | `86% (86/100)` | `90%(90/100)` |
