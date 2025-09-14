@@ -36,7 +36,7 @@ class ResNet_MAML(nn.Module):
           bias=self.config.bias),
       ) # hidden convs
     return layers
-  # _create_convs()
+  # _create_convs
 
   def forward(self, x, params=None):
     x = F.conv2d(
@@ -73,7 +73,7 @@ class ResNet_MAML(nn.Module):
         grads = torch.autograd.grad(loss, list(local_param.values()), create_graph=True)
         local_param = {name: param - (self.config.alpha * grad) for (name, param), grad in zip(local_param.items(), grads)}
     return local_param
-  # inner_update()
+  # inner_update
 
   def _get_fc(self, dummy):
     with torch.no_grad():

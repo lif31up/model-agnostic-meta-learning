@@ -1,7 +1,7 @@
 from models.ResNet_MAML import ResNet_MAML
 import torch.nn.functional as F
 
-class CNNMAML(ResNet_MAML):
+class CNN_MAML(ResNet_MAML):
   def forward(self, x, params=None):
     x = F.conv2d(
       input=x,
