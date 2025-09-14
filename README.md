@@ -23,68 +23,47 @@ MAML achieves this by optimizing for a set of parameters that can quickly adapt 
 confing.py contains the configuration settings for the model, including the framework, dimensions, learning rate, and other hyperparameters
 
 ```python
-MODEL_CONFIG = {
-  "input_channels": 1,
-  "hidden_channels": 32,
-  "output_channels": 5,
-  "conv:kernel_size": 3,
-  "conv:padding": 1,
-  "conv:stride": 1,
-  "l1_in_features": 2592
-} # MODEL_CONFIG
-
-TRAINING_CONFIG = {
-  "iterations": 100,
-  "epochs": 30,
-  "alpha": 1e-3,
-  "beta": 1e-4,
-  "iterations:batch_size": 32,
-  "epochs:batch_size": 32,
-} # TRAINING_CONFIG
-
-FRAMEWORK = { "n_way": 5, "k_shot": 1, "n_query": 2 }
+class Config:
+  def __init__(self):
+    self.input_channels, self.hidden_channels, self.output_channels = 1, 32, 5
+    self.n_convs = 4
+    self.kernel_size, self.padding, self.stride, self.bias = 3, 1, 1, True
+    self.iterations, self.alpha = 100, 1e-3
+    self.eps = 1e-5
+    self.epochs, self.beta = 30, 1e-4
+    self.batch_size = 8
+    self.n_way, self.k_shot, self.n_query = 5, 5, 5
+    self.save_to = "./models"
+    self.transform = transform
+    self.imageset = get_imageset()
 ```
 ### Training
 train.py is a script to train the model on the omniglot dataset. It includes the training loop, evaluation, and saving the model checkpoints.
 ```python
 if __name__ == "__main__":
-  from config import MODEL_CONFIG, TRAINING_CONFIG, FRAMEWORK
+  from config import Config
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  tv.datasets.Omniglot(root="./data/", background=True, download=True)
-  imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  PATH = "5w.bin"
-  seen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), FRAMEWORK["n_way"])]
-  episoder = FewShotEpisoder(imageset, seen_classes, FRAMEWORK["k_shot"], FRAMEWORK["n_query"], transform)
-  model = MAML(MODEL_CONFIG)
-  train(path=PATH, model=model, config=TRAINING_CONFIG, episoder=episoder, device=device)
-# if __name__ == "__main__":
+  maml_config = Config()
+  imageset = maml_config.imageset
+  seen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), maml_config.n_way)]
+  episoder = FewShotEpisoder(imageset, seen_classes, maml_config.k_shot, maml_config.n_query, maml_config.transform)
+  model = ResNetMAML(maml_config)
+  train(path=maml_config.save_to, model=model, config=maml_config, episoder=episoder, device=device)
 ```
 ### Evaluation
 eval.py is used to evaluate the trained model on the omniglot dataset. It loads the model and tokenizer, processes the dataset, and computes the accuracy of the model.
 ```python
 if __name__ == "__main__":
-  tv.datasets.Omniglot(root="./data/", background=True, download=True)
-  imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")
-
-  VAL_CONFIG = {
-    "iterations": 100,
-    "beta": 1e-4,
-    "iterations:batch_size": 32,
-  }  # VALIDATION_CONFIG
-  VAL_FRAMEWORK = {"n_way": 5, "k_shot": 3, "n_query": 10}
-  print(f"Validated Framework: {VAL_FRAMEWORK}")
-
+  from config import Config
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  my_data = torch.load("/content/drive/MyDrive/Colab Notebooks/MAML.bin", map_location=device, weights_only=False)
-  my_model = MAML(my_data["MODEL_CONFIG"]).to(device)
+  my_data = torch.load("put your model path!!", map_location=device, weights_only=False)
+  config, convig = my_data['config'], Config()
+  my_model = ResNetMAML(config).to(device)
   my_model.load_state_dict(my_data["sate"])
-
-  unseen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), my_data["FRAMEWORK"]["n_way"])]
-  evisoder = FewShotEpisoder(imageset, unseen_classes, VAL_FRAMEWORK["k_shot"], VAL_FRAMEWORK["n_query"], transform, True)
-  counts, n_problems = evaluate(my_model, evisoder=evisoder, config=VAL_CONFIG, device=device, logging=True)
+  unseen_classes = [_ for _ in random.sample(list(convig.imageset.class_to_idx.values()), my_data["FRAMEWORK"]["n_way"])]
+  evisoder = FewShotEpisoder(convig.imageset, unseen_classes, convig.k_shot, convig.n_query, config.transform, True)
+  counts, n_problems = evaluate(my_model, evisoder=evisoder, config=config, device=device, logging=True)
   print(f"unseen classes: {evisoder.classes}\nACC: {(counts / n_problems):.2f}({counts}/{n_problems})")
-# if __name__ == "__main__":
 ```
 ---
 ## Technical Highlights
@@ -94,52 +73,82 @@ Although MAML is one of the most prominent few-shot learning algorithms, it's ma
 The inner loop is the first stage of MAML's algorithm where task-specific adaptations occur. It involves taking a small number of examples (support set) from a new task and creating parameters for each task. It then performs gradient updates to quickly adapt the model parameters for that specific task.
 
 ```python
-def inner_update(self, task):
-  local_params = {name: param.clone() for name, param in self.named_parameters()}
-  for _ in range(self.epochs):
-    for feature, label in DataLoader(task, batch_size=self.batch_size, shuffle=True, num_workers=4, pin_memory=True):
-      feature, label = feature.to(self.device, non_blocking=True), label.to(self.device, non_blocking=True)
-      pred = self.forward(feature, local_params)
-      loss = nn.MSELoss()(pred, label)
-      grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
-      local_params = {name: param - (self.alpha * grad) for (name, param), grad in zip(local_params.items(), grads)}
-  # for for
-  return local_params
-# inner_update()
+class ResNetMAML(nn.Module):
+  def inner_update(self, task, device=None):
+    local_param = {name: param.clone() for name, param in self.named_parameters()}  # init local params
+    for _ in range(self.config.iterations): # update local params to the task
+      for feature, label in DataLoader(task, batch_size=self.config.batch_size, shuffle=True, pin_memory=True, num_workers=4):
+        feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
+        pred = self.forward(feature, local_param)
+        loss = nn.MSELoss()(pred, label)
+        grads = torch.autograd.grad(loss, list(local_param.values()), create_graph=True)
+        local_param = {name: param - (self.config.alpha * grad) for (name, param), grad in zip(local_param.items(), grads)}
+    return local_param
+  # inner_update()
 ```
 ### Outer Loop
 The outer-loop is the second stage of MAML's algorithm where meta-learning occurs. It optimizes the initial model parameters to ensure they can be quickly adapted to new tasks with minimal data. This stage uses performance on the query set to update the model's starting point.
 
 ```python
-tasks, query_set = episoder.get_episode()
-local_params = list()
-for task in tasks: local_params.append(maml.inner_update(task))
-for feature, label in DataLoader(query_set, batch_size=CONFIG["batch_size"], shuffle=True, pin_memory=True, num_workers=4):
-  feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
-  for local_param in local_params:
-    pred = maml.forward(feature, local_param)
-    print(f"pred shape: {pred.shape} feature shape: {feature.shape} label shape: {label.shape}")
-  # for
-  break
-# for
+def train(model, path, config, episoder:FewShotEpisoder, device):
+  assert isinstance(config, Config), "config is not a Config."
+
+  model.to(device)
+  optim = torch.optim.Adam(model.parameters(), lr=config.beta, eps=config.eps)
+  criterion = nn.CrossEntropyLoss()
+
+  progression = tqdm(range(config.epochs))
+  for _ in progression:
+    tasks, query_set = episoder.get_episode()
+    local_params = list()
+    for task in tasks: local_params.append(model.inner_update(task=task, device=device)) # inner loop: init local params, adapt to the task, ueses seen classes in support_set
+    loss = float(0)
+    for feature, label in DataLoader(query_set, batch_size=config.batch_size, shuffle=True, pin_memory=True, num_workers=4):
+      feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
+      task_loss = float(0)
+      for local_param in local_params:
+        pred = model.forward(feature, local_param)
+        task_loss += criterion(pred, label)
+      loss += task_loss / len(local_params) # calculate avg of losses per tasks
+    loss /= query_set.__len__()
+    optim.zero_grad()
+    loss.backward()
+    optim.step()
+    progression.set_postfix(loss=loss.item())
+
+  features = {
+    "sate": model.state_dict(),
+    "config": config
+  } # feature
+  torch.save(features, f"{path}.bin")
 ```
 
 ### Forward
 The forward process in MAML differs significantly from other deep neural networks. First, it adapts to tasks from the query set. Then, it forwards each parameter per task and calculates probabilities.
 
 ```python
-def forward(self, x, params=None):
-  if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
-  x = F.conv2d(x, weight=params['conv1.weight'], bias=params['conv1.bias'], padding=self.config["conv:padding"],
-               stride=self.config["conv:stride"])
-  res = x
-  x = F.conv2d(self.act(x) + res, weight=params['conv2.weight'], bias=params['conv2.bias'],
-               padding=self.config["conv:padding"], stride=self.config["conv:stride"])
-  res = x
-  x = F.conv2d(self.act(x) + res, weight=params['conv3.weight'], bias=params['conv3.bias'],
-               padding=self.config["conv:padding"], stride=self.config["conv:stride"])
-  x = self.pool(x)
-  x = self.flatten(x)
-  return F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])
-# forward()
+class ResNetMAML(nn.Module):
+  def forward(self, x, params=None):
+    if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
+    x = F.conv2d(
+      input=x,
+      weight=params[f'convs.{0}.weight'],
+      bias=params[f'convs.{0}.bias'],
+      stride=self.config.stride,
+      padding=self.config.padding
+    ) # first conv
+    for i in range(1, self.convs.__len__()):
+      res = x
+      x = F.conv2d(
+        input=x,
+        weight=params[f'convs.{i}.weight'],
+        bias=params[f'convs.{i}.bias'],
+        stride=self.config.stride,
+        padding=self.config.padding,
+      ) # hidden convs
+      x = self.act(x)
+      x += res
+    x = self.pool(x)
+    x = self.flat(x)
+    return F.linear(x, weight=params['fc.weight'], bias=params['fc.bias'])
 ```
