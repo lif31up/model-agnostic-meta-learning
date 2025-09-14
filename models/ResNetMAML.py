@@ -38,15 +38,14 @@ class ResNetMAML(nn.Module):
     return layers
   # _create_convs()
 
-  def forward(self, x, params=None, mode='forward'):
-    if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
+  def forward(self, x, params=None):
     x = F.conv2d(
       input=x,
       weight=params[f'convs.{0}.weight'],
       bias=params[f'convs.{0}.bias'],
       stride=self.config.stride,
       padding=self.config.padding
-    ) # first conv
+    )  # first conv
     x = self.act(x)
     for i in range(1, self.convs.__len__()):
       res = x
@@ -56,12 +55,11 @@ class ResNetMAML(nn.Module):
         bias=params[f'convs.{i}.bias'],
         stride=self.config.stride,
         padding=self.config.padding,
-      ) # hidden convs
+      )  # hidden convs
       x = self.act(x)
       x += res
     x = self.pool(x)
     x = self.flat(x)
-    if mode == "_get_fc": return x
     return F.linear(x, weight=params['fc.weight'], bias=params['fc.bias'])
   # forward
 
@@ -79,7 +77,9 @@ class ResNetMAML(nn.Module):
 
   def _get_fc(self, dummy):
     with torch.no_grad():
-      x = self.forward(dummy, mode='_get_fc')
-      return nn.Linear(in_features=x.shape[1], out_features=self.config.output_channels, bias=self.config.bias)
+      for conv in self.convs: dummy = conv(dummy)
+      dummy = self.pool(dummy)
+      dummy = self.flat(dummy)
+      return nn.Linear(in_features=dummy.shape[1], out_features=self.config.output_channels, bias=self.config.bias)
   # _get_fcc
 # MAMLNet
