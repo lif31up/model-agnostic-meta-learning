@@ -3,9 +3,15 @@ This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Ada
 * **⭐ Colab Playground:** [Colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
 * **Huggingface:** [Huggingface](https://huggingface.co/lif31up/model-agnostic-meta-learning)
 
-|            | 5 Way ACC (1 shot) | 5 Way ACC(5 shot) |
-|------------|-------------------|-------------------|
-|**Omniglot**| `76%` **(76/50)** | `86%` **(86/100)** |
+**Implementations:**
+* `CNN_MAML`: Convolutional Network with MAML
+* `CNN_BOIL`: Convolutional Network with BOIL
+* `ResNet_MAML`: Residual Network with MAML
+* `ResNet_BOIL`: Residual Network with BOIL
+
+|           5w5s ACC                  | CNN_MAML       | CNN_BOIL       | ResNet_MAML    | ResNet_BOIL   |
+|-----------------------------|----------------|----------------|----------------|---------------|
+| `Omniglot Futurama`  | `86% (86/100)` | `83% (83/100)` | `86% (86/100)` | `90%(90/100)` |
 
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
 The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
@@ -129,7 +135,6 @@ The forward process in MAML differs significantly from other deep neural network
 ```python
 class ResNetMAML(nn.Module):
   def forward(self, x, params=None):
-    if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
     x = F.conv2d(
       input=x,
       weight=params[f'convs.{0}.weight'],
