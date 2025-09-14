@@ -2,55 +2,50 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch import nn
-from model.MAML import MAML
+from models.ResNetMAML import ResNetMAML
 from FewShotEpisoder import FewShotEpisoder
 import random
-from transform import *
 
-def train(model, path, config, episoder, device):
+def train(model, path, config, episoder:FewShotEpisoder, device):
+  assert isinstance(config, Config), "config is not a Config."
+
   model.to(device)
-  optim = torch.optim.Adam(model.parameters(), lr=config["beta"])
+  optim = torch.optim.Adam(model.parameters(), lr=config.beta, eps=config.eps)
   criterion = nn.CrossEntropyLoss()
 
-  progress_bar, whole_loss = tqdm(range(config["epochs"])), 0.
-  for _ in progress_bar:
+  progression = tqdm(range(config.epochs))
+  for _ in progression:
     tasks, query_set = episoder.get_episode()
     local_params = list()
-    for task in tasks: local_params.append(model.inner_update(task, config, device)) # inner loop: init local params, adapt to the task, ueses seen classes in support_set
-    loss = 0. # outer loop: update meta/global params, uses seen classes in query_set
-    for feature, label in DataLoader(query_set, batch_size=config["epochs:batch_size"], shuffle=True, pin_memory=True, num_workers=4):
+    for task in tasks: local_params.append(model.inner_update(task=task, device=device)) # inner loop: init local params, adapt to the task, ueses seen classes in support_set
+    loss = float(0)
+    for feature, label in DataLoader(query_set, batch_size=config.batch_size, shuffle=True, pin_memory=True, num_workers=4):
       feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
-      task_loss = 0.
+      task_loss = float(0)
       for local_param in local_params:
         pred = model.forward(feature, local_param)
         task_loss += criterion(pred, label)
       loss += task_loss / len(local_params) # calculate avg of losses per tasks
-    loss /= len(query_set)
+    loss /= query_set.__len__()
     optim.zero_grad()
     loss.backward()
     optim.step()
-    progress_bar.set_postfix(loss=loss.item())
-    whole_loss += loss.item()
+    progression.set_postfix(loss=loss.item())
 
   features = {
     "sate": model.state_dict(),
-    "FRAMEWORK": FRAMEWORK,
-    "MODEL_CONFIG": MODEL_CONFIG,
-    "TRAINING_CONFIG": TRAINING_CONFIG
+    "config": config
   } # feature
-  torch.save(features, path)
-  return 0
+  torch.save(features, f"{path}.bin")
 # train()
 
 if __name__ == "__main__":
-  from config import MODEL_CONFIG, TRAINING_CONFIG, FRAMEWORK
+  from config import Config
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  tv.datasets.Omniglot(root="./data/", background=True, download=True)
-  imageset = tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  PATH = "/content/drive/MyDrive/Colab Notebooks/MAML.bin"
-  seen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), FRAMEWORK["n_way"])]
-  episoder = FewShotEpisoder(imageset, seen_classes, FRAMEWORK["k_shot"], FRAMEWORK["n_query"], transform)
-  model = MAML(MODEL_CONFIG)
-  train(path=PATH, model=model, config=TRAINING_CONFIG, episoder=episoder, device=device)
+  maml_config = Config()
+  imageset = maml_config.imageset
+  seen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), maml_config.n_way)]
+  episoder = FewShotEpisoder(imageset, seen_classes, maml_config.k_shot, maml_config.n_query, maml_config.transform)
+  model = ResNetMAML(maml_config)
+  train(path=maml_config.save_to, model=model, config=maml_config, episoder=episoder, device=device)
 # if __name__ == "__main__":

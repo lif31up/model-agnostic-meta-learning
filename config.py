@@ -1,20 +1,23 @@
-MODEL_CONFIG = {
-  "input_channels": 1,
-  "hidden_channels": 32,
-  "output_channels": 5,
-  "conv:kernel_size": 3,
-  "conv:padding": 1,
-  "conv:stride": 1,
-  "l1_in_features": 2592
-} # MODEL_CONFIG
+import torchvision as tv
+from transform import transform
 
-TRAINING_CONFIG = {
-  "iterations": 100,
-  "epochs": 30,
-  "alpha": 1e-3,
-  "beta": 1e-4,
-  "iterations:batch_size": 32,
-  "epochs:batch_size": 32,
-} # TRAINING_CONFIG
+class Config:
+  def __init__(self):
+    self.input_channels, self.hidden_channels, self.output_channels = 1, 32, 5
+    self.n_convs = 4
+    self.kernel_size, self.padding, self.stride, self.bias = 3, 1, 1, True
+    self.iterations, self.alpha = 100, 1e-3
+    self.eps = 1e-5
+    self.epochs, self.beta = 30, 1e-4
+    self.batch_size = 8
+    self.n_way, self.k_shot, self.n_query = 5, 5, 5
+    self.save_to = "./models"
+    self.transform = transform
+    self.imageset = get_imageset()
+  # __init__():
+# MAMLConfig
 
-FRAMEWORK = { "n_way": 5, "k_shot": 1, "n_query": 2 }
+def get_imageset():
+  tv.datasets.Omniglot(root="./data/", background=True, download=True)
+  return tv.datasets.ImageFolder(root="./data/omniglot-py/images_background/Futurama")
+# _get_imageset()

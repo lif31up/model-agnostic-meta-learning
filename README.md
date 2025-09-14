@@ -130,11 +130,14 @@ The forward process in MAML differs significantly from other deep neural network
 ```python
 def forward(self, x, params=None):
   if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
-  x = F.conv2d(x, weight=params['conv1.weight'], bias=params['conv1.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+  x = F.conv2d(x, weight=params['conv1.weight'], bias=params['conv1.bias'], padding=self.config["conv:padding"],
+               stride=self.config["conv:stride"])
   res = x
-  x = F.conv2d(self.act(x) + res, weight=params['conv2.weight'], bias=params['conv2.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+  x = F.conv2d(self.act(x) + res, weight=params['conv2.weight'], bias=params['conv2.bias'],
+               padding=self.config["conv:padding"], stride=self.config["conv:stride"])
   res = x
-  x = F.conv2d(self.act(x) + res, weight=params['conv3.weight'], bias=params['conv3.bias'], padding=self.config["conv:padding"], stride=self.config["conv:stride"])
+  x = F.conv2d(self.act(x) + res, weight=params['conv3.weight'], bias=params['conv3.bias'],
+               padding=self.config["conv:padding"], stride=self.config["conv:stride"])
   x = self.pool(x)
   x = self.flatten(x)
   return F.linear(x, weight=params['l1.weight'], bias=params['l1.bias'])

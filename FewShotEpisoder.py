@@ -12,9 +12,6 @@ class FewShotDataset(Dataset):
   def __len__(self): return len(self.indices_t)
 
   def __getitem__(self, index: int):
-    """ Returns a sample from the dataset at the given index.
-      Args: index of the sample to be retrieved.
-      Returns: tuple of the transformed feature and the label. """
     assert index < len(self.indices_t), IndexError("Index out of bounds") # check if index is out of bounds
     feature, label = self.dataset[self.indices_t[index]]
     # apply transformation
@@ -35,7 +32,6 @@ class FewShotEpisoder:
   # __init__()
 
   def get_indices_t(self):
-    """sort dataset and return their indiceses"""
     indices_t = {label: [] for label in range(self.classes.__len__())}
     for index, (_, label) in enumerate(self.dataset):
       if label in self.classes: indices_t[self.classes.index(label)].append(index)
