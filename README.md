@@ -90,7 +90,6 @@ class ResNetMAML(nn.Module):
         grads = torch.autograd.grad(loss, list(local_param.values()), create_graph=True)
         local_param = {name: param - (self.config.alpha * grad) for (name, param), grad in zip(local_param.items(), grads)}
     return local_param
-  # inner_update()
 ```
 ### Outer Loop
 The outer-loop is the second stage of MAML's algorithm where meta-learning occurs. It optimizes the initial model parameters to ensure they can be quickly adapted to new tasks with minimal data. This stage uses performance on the query set to update the model's starting point.
