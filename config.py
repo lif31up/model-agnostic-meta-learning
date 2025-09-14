@@ -1,5 +1,5 @@
+import torch
 import torchvision as tv
-from transform import transform
 
 class Config:
   def __init__(self):
@@ -14,8 +14,16 @@ class Config:
     self.save_to = "./models"
     self.transform = transform
     self.imageset = get_imageset()
+    self.dummy = torch.zeros(1, self.input_channels, 28, 28)
   # __init__():
 # MAMLConfig
+
+transform = tv.transforms.Compose([
+  tv.transforms.Resize((28, 28)),
+  tv.transforms.Grayscale(num_output_channels=1),
+  tv.transforms.ToTensor(),
+  tv.transforms.Normalize(mean=[0.5], std=[0.5]),
+]) # transform
 
 def get_imageset():
   tv.datasets.Omniglot(root="./data/", background=True, download=True)

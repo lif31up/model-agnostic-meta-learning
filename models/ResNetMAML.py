@@ -9,13 +9,10 @@ class ResNetMAML(nn.Module):
     super(ResNetMAML, self).__init__()
     self.config = config
     self.convs = self._create_convs(self.config.n_convs)
-    self.fc = nn.Linear(
-      in_features=21632,
-      out_features=self.config.output_channels,
-      bias=self.config.bias)
     self.act = nn.SiLU()
     self.flat = nn.Flatten(start_dim=1)
-    self.pool = nn.MaxPool2d(stride=1, kernel_size=3)
+    self.pool = nn.MaxPool2d(stride=2, kernel_size=3)
+    self.fc = self._get_fc(self.config.dummy)
   # __init__
 
   def _create_convs(self, n_convs):
@@ -41,7 +38,7 @@ class ResNetMAML(nn.Module):
     return layers
   # _create_convs()
 
-  def forward(self, x, params=None):
+  def forward(self, x, params=None, mode='forward'):
     if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
     x = F.conv2d(
       input=x,
@@ -50,6 +47,7 @@ class ResNetMAML(nn.Module):
       stride=self.config.stride,
       padding=self.config.padding
     ) # first conv
+    x = self.act(x)
     for i in range(1, self.convs.__len__()):
       res = x
       x = F.conv2d(
@@ -63,6 +61,7 @@ class ResNetMAML(nn.Module):
       x += res
     x = self.pool(x)
     x = self.flat(x)
+    if mode == "_get_fc": return x
     return F.linear(x, weight=params['fc.weight'], bias=params['fc.bias'])
   # forward
 
@@ -77,4 +76,10 @@ class ResNetMAML(nn.Module):
         local_param = {name: param - (self.config.alpha * grad) for (name, param), grad in zip(local_param.items(), grads)}
     return local_param
   # inner_update()
+
+  def _get_fc(self, dummy):
+    with torch.no_grad():
+      x = self.forward(dummy, mode='_get_fc')
+      return nn.Linear(in_features=x.shape[1], out_features=self.config.output_channels, bias=self.config.bias)
+  # _get_fcc
 # MAMLNet
