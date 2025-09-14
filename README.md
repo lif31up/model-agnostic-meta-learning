@@ -16,7 +16,7 @@ This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Ada
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
 The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
 
-![img_1.png](img_0.png)
+<img src="img_0.png" style="width:100%; height:auto;" alt="Description">
 
 * **Task**: classifying image with few dataset.
 * **Dataset**: `omniglot futurama`
