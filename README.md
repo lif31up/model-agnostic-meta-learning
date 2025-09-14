@@ -18,7 +18,7 @@ The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning 
 
 
 <section style="width: 100%; height: fit-content; display:flex; justify-content: center; align-content: center;">
-  <img src="img_0.png" style="width:70%; height:auto;" alt="Description">
+  <img src="img_0.png" style="width:320px; height:auto;" alt="Description">
 </section>
 
 * **Task**: classifying image with few dataset.
