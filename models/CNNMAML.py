@@ -3,7 +3,6 @@ import torch.nn.functional as F
 
 class CNNMAML(ResNetMAML):
   def forward(self, x, params=None):
-    if not params: params = dict(self.named_parameters())  # uses meta/global params when local params not given
     x = F.conv2d(
       input=x,
       weight=params[f'convs.{0}.weight'],
