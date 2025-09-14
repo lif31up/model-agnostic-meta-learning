@@ -17,7 +17,7 @@ This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Ada
 The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
 
 
-<section style="display:flex; justify-content: center; align-content: center;">
+<section style="width: 100%; height: fit-content; display:flex; justify-content: center; align-content: center;">
   <img src="img_0.png" style="width:70%; height:auto;" alt="Description">
 </section>
 
