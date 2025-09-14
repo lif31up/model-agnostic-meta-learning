@@ -4,9 +4,9 @@ from torch.utils.data import DataLoader
 import torch.nn.functional as F
 from config import Config
 
-class ResNetMAML(nn.Module):
+class ResNet_MAML(nn.Module):
   def __init__(self, config: Config):
-    super(ResNetMAML, self).__init__()
+    super(ResNet_MAML, self).__init__()
     self.config = config
     self.convs = self._create_convs(self.config.n_convs)
     self.act = nn.SiLU()

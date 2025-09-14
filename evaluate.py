@@ -3,7 +3,7 @@ import torch
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from FewShotEpisoder import FewShotEpisoder
-from models.ResNetMAML import ResNetMAML
+from models.ResNet_MAML import ResNet_MAML
 from torch import nn
 import copy
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   my_data = torch.load("put your model path!!", map_location=device, weights_only=False)
   config, convig = my_data['config'], Config()
-  my_model = ResNetMAML(config).to(device)
+  my_model = ResNet_MAML(config).to(device)
   my_model.load_state_dict(my_data["sate"])
   unseen_classes = [_ for _ in random.sample(list(convig.imageset.class_to_idx.values()), my_data["FRAMEWORK"]["n_way"])]
   evisoder = FewShotEpisoder(convig.imageset, unseen_classes, convig.k_shot, convig.n_query, config.transform, True)

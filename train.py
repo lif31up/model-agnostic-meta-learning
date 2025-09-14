@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch import nn
-from models.ResNetMAML import ResNetMAML
+from models.ResNet_MAML import ResNet_MAML
 from FewShotEpisoder import FewShotEpisoder
 import random
 
@@ -46,6 +46,6 @@ if __name__ == "__main__":
   imageset = maml_config.imageset
   seen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), maml_config.n_way)]
   episoder = FewShotEpisoder(imageset, seen_classes, maml_config.k_shot, maml_config.n_query, maml_config.transform)
-  model = ResNetMAML(maml_config)
+  model = ResNet_MAML(maml_config)
   train(path=maml_config.save_to, model=model, config=maml_config, episoder=episoder, device=device)
 # if __name__ == "__main__":

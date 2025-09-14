@@ -1,4 +1,4 @@
-from models.ResNetBOIL import ResNetBOIL
+from models.ResNet_BOIL import ResNetBOIL
 import torch.nn.functional as F
 
 class CNNBOIL(ResNetBOIL):

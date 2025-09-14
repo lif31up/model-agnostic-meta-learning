@@ -1,10 +1,9 @@
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-from config import Config
-from models.ResNetMAML import ResNetMAML
+from models.ResNet_MAML import ResNet_MAML
 
-class ResNetBOIL(ResNetMAML):
+class ResNetBOIL(ResNet_MAML):
   def inner_update(self, task, device=None):
     local_params = {name: param.clone() for name, param in self.named_parameters()}  # init local params
     for _ in range(self.config.iterations):  # update local params to the task
