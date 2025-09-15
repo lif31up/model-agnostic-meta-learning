@@ -12,6 +12,7 @@ class ResNet_MAML(nn.Module):
     self.act = nn.SiLU()
     self.flat = nn.Flatten(start_dim=1)
     self.pool = nn.MaxPool2d(stride=2, kernel_size=3)
+    self.norm = TaskNorm2d()
     self.fc = self._get_fc(self.config.dummy)
   # __init__
 
@@ -39,6 +40,7 @@ class ResNet_MAML(nn.Module):
   # _create_convs
 
   def forward(self, x, params=None):
+    if params is None: params = dict(self.named_parameters())
     x = F.conv2d(
       input=x,
       weight=params[f'convs.{0}.weight'],
@@ -83,3 +85,25 @@ class ResNet_MAML(nn.Module):
       return nn.Linear(in_features=dummy.shape[1], out_features=self.config.output_channels, bias=self.config.bias)
   # _get_fcc
 # MAMLNet
+
+class TaskNorm2d(nn.Module):
+  def __init__(self, num_features, eps=1e-5, momentum=0.1):
+    super(TaskNorm2d, self).__init__()
+    self.num_features = num_features
+    self.eps = eps
+    self.momentum = momentum
+    self.weight = nn.Parameter(torch.ones(num_features))
+    self.bias = nn.Parameter(torch.zeros(num_features))
+    self.register_buffer('mean', torch.zeros(num_features))
+    self.register_buffer('var', torch.ones(num_features))
+  # __init__
+
+  def forward(self, x, task_mean):
+    if self.training:
+      self.mean = (1 - self.momentum) * self.mean + self.momentum * task_mean
+      self.var = (1 - self.momentum) * self.var + self.momentum * task_mean ** 2
+      x_hat = (x - self.mean) / torch.sqrt(self.var + self.eps)
+    else: x_hat = (x - self.mean) / torch.sqrt(self.var + self.eps)
+    return self.weight * x_hat + self.bias
+  # forward
+# TaskNorm2d

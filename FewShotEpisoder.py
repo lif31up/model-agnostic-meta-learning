@@ -14,11 +14,17 @@ class FewShotDataset(Dataset):
   def __getitem__(self, index: int):
     assert index < len(self.indices_t), IndexError("Index out of bounds") # check if index is out of bounds
     feature, label = self.dataset[self.indices_t[index]]
-    # apply transformation
     feature = self.transform(feature)
     label = F.one_hot(torch.tensor(self.classes.index(label)), num_classes=len(self.classes)).float()
     return feature, label
-  # __getitem__()
+  # __getitem__
+
+  def _get_task_mean(self):
+    whole_sum = list()
+    for indice in self.indices_t: whole_sum.append(self.dataset[indice][0])
+    whole_sum = torch.stack(whole_sum, dim=0)
+    return torch.mean(whole_sum, dim=0)
+  # _get_task_mean
 # MAMLDataset
 
 class FewShotEpisoder:

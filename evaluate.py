@@ -14,6 +14,7 @@ def adapt(model, config, dataset, device, logging=False):
   progress_bar = range(config["iterations"])
   if logging: progress_bar = tqdm(progress_bar, desc="ADAPTING", leave=True)
   for _ in progress_bar:
+    loss = float(0)
     for feature, label in DataLoader(dataset, batch_size=config["iterations:batch_size"], shuffle=True, pin_memory=True, num_workers=4):
       feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
       pred = model.forward(feature)
