@@ -18,15 +18,15 @@ This implementation is inspired by [**"Model-Agnostic Meta-Learning for Fast Ada
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
 The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
 
-<p align="center">
-  <img alt="figure_0" src="readme/figure_0.png" style="width: 45%;" />
-</p>
-
 * **Task**: classifying image with few dataset.
 * **Dataset**: `omniglot futurama`
 
 FSL(Few-Shot Learning) focuses on enabling models to generalize to new tasks with only a few labeled examples. 
 MAML achieves this by optimizing for a set of parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data.
+
+<p align="center">
+  <img alt="figure_0" src="readme/figure_0.png" style="width: 45%;" />
+</p>
 
 ---
 ### Configuration
