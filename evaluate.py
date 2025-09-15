@@ -3,19 +3,19 @@ import torch
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from FewShotEpisoder import FewShotEpisoder
-from models.ResNet import ResNet_MAML
+from models.ResNet import ResNet_BOIL
 from torch import nn
 import copy
 
 def adapt(model, config, dataset, device, logging=False):
   model = copy.deepcopy(model).to(device)
-  optim = torch.optim.Adam(model.parameters(), lr=config["beta"])
+  optim = torch.optim.Adam(model.parameters(), lr=config.alpha)
   criterion = nn.CrossEntropyLoss()
-  progress_bar = range(config["iterations"])
+  progress_bar = range(config.iterations)
   if logging: progress_bar = tqdm(progress_bar, desc="ADAPTING", leave=True)
   for _ in progress_bar:
     loss = float(0)
-    for feature, label in DataLoader(dataset, batch_size=config["iterations:batch_size"], shuffle=True, pin_memory=True, num_workers=4):
+    for feature, label in DataLoader(dataset, batch_size=config.batch_size, shuffle=True, pin_memory=True, num_workers=4):
       feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
       pred = model.forward(feature)
       loss = criterion(pred, label)
@@ -37,17 +37,17 @@ def evaluate(model, evisoder, config, device, logging=False):
     pred = adapted_model.forward(feature)
     if torch.argmax(pred) == torch.argmax(label): counts += 1
   return counts, n_problems
-# validation
+# evaluate
 
 if __name__ == "__main__":
-  from config import Config
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  my_data = torch.load("put your model path!!", map_location=device, weights_only=False)
-  config, convig = my_data['config'], Config()
-  my_model = ResNet_MAML(config).to(device)
-  my_model.load_state_dict(my_data["sate"])
-  unseen_classes = [_ for _ in random.sample(list(convig.imageset.class_to_idx.values()), my_data["FRAMEWORK"]["n_way"])]
-  evisoder = FewShotEpisoder(convig.imageset, unseen_classes, convig.k_shot, convig.n_query, config.transform, True)
-  counts, n_problems = evaluate(my_model, evisoder=evisoder, config=config, device=device, logging=True)
-  print(f"unseen classes: {evisoder.classes}\nACC: {(counts / n_problems):.2f}({counts}/{n_problems})")
+  my_data = torch.load(f='/content/drive/MyDrive/Colab Notebooks/ResNet_BOIL_.bin', map_location="cpu", weights_only=False)
+  my_config = my_data['config']
+  my_model = ResNet_BOIL(my_config)
+  my_model.load_state_dict(my_data['sate'])
+  imageset = my_config.imageset
+  unseen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), my_config.n_way)]
+  evisoder = FewShotEpisoder(imageset, unseen_classes, 5, 10, my_config.transform, is_val=True)
+  n_counts, n_problems = evaluate(model=my_model, evisoder=evisoder, config=my_config, device=device, logging=True)
+  print(f'{n_counts / n_problems:.2f}({n_counts}/{n_problems})')
 # if __name__ == "__main__":
