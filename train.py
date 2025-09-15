@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from torch import nn
-from models.ResNet_MAML import ResNet_MAML
+from models.ResNet import ResNet_MAML
 from FewShotEpisoder import FewShotEpisoder
 import random
 

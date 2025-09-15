@@ -3,7 +3,7 @@ import torch
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from FewShotEpisoder import FewShotEpisoder
-from models.ResNet_MAML import ResNet_MAML
+from models.ResNet import ResNet_MAML
 from torch import nn
 import copy
 
