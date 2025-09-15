@@ -24,7 +24,7 @@ The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning 
 FSL(Few-Shot Learning) focuses on enabling models to generalize to new tasks with only a few labeled examples. 
 MAML achieves this by optimizing for a set of parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data.
 
----
+
 ### Configuration
 confing.py contains the configuration settings for the model, including the framework, dimensions, learning rate, and other hyperparameters
 
