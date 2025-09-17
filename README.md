@@ -134,6 +134,7 @@ The forward process in MAML differs significantly from other deep neural network
 ```python
 class ResNetMAML(nn.Module):
   def forward(self, x, params=None):
+    if params is None: params = dict(self.named_parameters())
     x = F.conv2d(
       input=x,
       weight=params[f'convs.{0}.weight'],
