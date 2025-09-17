@@ -4,10 +4,10 @@ This implementation is inspired by ["Model-Agnostic Meta-Learning for Fast Adapt
 * **Huggingface:** [Huggingface](https://huggingface.co/lif31up/model-agnostic-meta-learning)
 
 **Implementations:**
-* `CNN_MAML`: Convolutional Network with MAML
-* `CNN_BOIL`: Convolutional Network with BOIL
-* `ResNet_MAML`: Residual Network with MAML
-* `ResNet_BOIL`: Residual Network with BOIL
+* `CNN_MAML`
+* `CNN_BOIL`
+* `ResNet_MAML`
+* `ResNet_BOIL`
 
 **Results:**
 
