@@ -3,6 +3,7 @@ import torch.nn.functional as F
 
 class CNN_MAML(ResNet_MAML):
   def forward(self, x, params=None):
+    if params is None: params = dict(self.named_parameters())
     x = F.conv2d(
       input=x,
       weight=params[f'convs.{0}.weight'],
@@ -27,6 +28,7 @@ class CNN_MAML(ResNet_MAML):
 
 class CNN_BOIL(ResNet_BOIL):
   def forward(self, x, params=None):
+    if params is None: params = dict(self.named_parameters())
     x = F.conv2d(
       input=x,
       weight=params[f'convs.{0}.weight'],
