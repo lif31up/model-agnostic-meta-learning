@@ -15,7 +15,7 @@ class Config:
     self.transform = transform
     self.imageset = get_imageset()
     self.dummy = torch.zeros(1, self.input_channels, 28, 28)
-  # __init__():
+  # __init__
 # MAMLConfig
 
 transform = tv.transforms.Compose([

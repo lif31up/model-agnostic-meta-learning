@@ -42,6 +42,7 @@ class Config:
     self.save_to = "./models"
     self.transform = transform
     self.imageset = get_imageset()
+    self.dummy = torch.zeros(1, self.input_channels, 28, 28)
 ```
 ### Training
 train.py is a script to train the model on the omniglot dataset. It includes the training loop, evaluation, and saving the model checkpoints.
