@@ -54,7 +54,7 @@ if __name__ == "__main__":
   imageset = maml_config.imageset
   seen_classes = [_ for _ in random.sample(list(imageset.class_to_idx.values()), maml_config.n_way)]
   episoder = FewShotEpisoder(imageset, seen_classes, maml_config.k_shot, maml_config.n_query, maml_config.transform)
-  model = ResNetMAML(maml_config)
+  model = ResNetMAML(maml_config)  # choose your arch from here!!
   train(path=maml_config.save_to, model=model, config=maml_config, episoder=episoder, device=device)
 ```
 ### Evaluation
