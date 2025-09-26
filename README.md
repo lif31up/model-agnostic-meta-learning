@@ -130,7 +130,7 @@ def train(model, path, config, episoder:FewShotEpisoder, device):
 ```
 
 ### Adapt
-`evaluate` includes `adapt()` which adapts the model that learned via MAML algorithms to new FSL tasks.
+`evaluate.py` includes `adapt()` which adapts the model that learned via MAML algorithms to new FSL tasks.
 
 ```python
 def adapt(model, config, dataset, device, logging=False):
