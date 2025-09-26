@@ -150,4 +150,16 @@ def adapt(model, config, dataset, device, logging=False):
       optim.step()
     if logging: progress_bar.set_postfix(loss=loss.item())
   return model
+
+def evaluate(model, evisoder, config, device, logging=False):
+  assert evisoder.is_val, "episoder.is_val should be True."
+  (dataset, testset) = evisoder.get_episode_val()
+  adapted_model = adapt(model=model, dataset=dataset, config=config, device=device, logging=logging)
+  adapted_model.eval()
+  counts, n_problems = 0, len(testset)
+  for feature, label in DataLoader(testset, batch_size=1, shuffle=True, pin_memory=True, num_workers=4):
+    feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
+    pred = adapted_model.forward(feature)
+    if torch.argmax(pred) == torch.argmax(label): counts += 1
+  return counts, n_problems
 ```
