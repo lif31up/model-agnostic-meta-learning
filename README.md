@@ -130,7 +130,7 @@ def train(model, path, config, episoder:FewShotEpisoder, device):
 ```
 
 ### Adapt
-`evaluate.py` includes `adapt()` which adapts the model that learned via MAML algorithms to new FSL tasks.
+`evaluate.py` includes `adapt()` which adapts the model that learned via MAML algorithms into new FSL tasks. `evaluate()` measures accuracy of the adapted model.
 
 ```python
 def adapt(model, config, dataset, device, logging=False):
@@ -150,34 +150,4 @@ def adapt(model, config, dataset, device, logging=False):
       optim.step()
     if logging: progress_bar.set_postfix(loss=loss.item())
   return model
-```
-
-### Forward
-The forward process in MAML differs significantly from other deep neural networks. First, it adapts to tasks from the query set. Then, it forwards each parameter per task and calculates probabilities.
-
-```python
-class ResNetMAML(nn.Module):
-  def forward(self, x, params=None):
-    if params is None: params = dict(self.named_parameters())
-    x = F.conv2d(
-      input=x,
-      weight=params[f'convs.{0}.weight'],
-      bias=params[f'convs.{0}.bias'],
-      stride=self.config.stride,
-      padding=self.config.padding
-    ) # first conv
-    for i in range(1, self.convs.__len__()):
-      res = x
-      x = F.conv2d(
-        input=x,
-        weight=params[f'convs.{i}.weight'],
-        bias=params[f'convs.{i}.bias'],
-        stride=self.config.stride,
-        padding=self.config.padding,
-      ) # hidden convs
-      x = self.act(x)
-      x += res
-    x = self.pool(x)
-    x = self.flat(x)
-    return F.linear(x, weight=params['fc.weight'], bias=params['fc.bias'])
 ```
