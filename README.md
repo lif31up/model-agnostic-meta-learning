@@ -26,7 +26,7 @@ MAML achieves this by optimizing for local/gloval parameters concept that can qu
 
 
 ### Configuration
-confing.py contains the configuration settings for the model, including the framework, dimensions, learning rate, and other hyperparameters
+`confing.py` contains the configuration settings for the model, including the framework, dimensions, learning rates (alpha, beta), and other hyperparameters like kernel size.
 
 ```python
 class Config:
@@ -45,7 +45,7 @@ class Config:
     self.dummy = torch.zeros(1, self.input_channels, 28, 28)
 ```
 ### Training
-train.py is a script to train the model on the omniglot dataset. It includes the training loop, evaluation, and saving the model checkpoints.
+`train.py` is a script to train the model on the omniglot dataset. It includes the training loop and saving the model checkpoints.
 ```python
 if __name__ == "__main__":
   from config import Config
@@ -58,7 +58,7 @@ if __name__ == "__main__":
   train(path=maml_config.save_to, model=model, config=maml_config, episoder=episoder, device=device)
 ```
 ### Evaluation
-eval.py is used to evaluate the trained model on the omniglot dataset. It loads the model and tokenizer, processes the dataset, and computes the accuracy of the model.
+`eval.py` is used to evaluate the trained model on the omniglot dataset. It loads the model and tokenizer, processes the dataset, and computes the accuracy of the model.
 ```python
 if __name__ == "__main__":
   from config import Config
@@ -74,10 +74,10 @@ if __name__ == "__main__":
 ```
 ---
 ## Technical Highlights
-Although MAML is one of the most prominent few-shot learning algorithms, it's mathematically complex even compared to other modern deep learning approaches. Both the learning and evaluation processes consist of two stages.
+Although MAML is one of the most prominent few-shot learning algorithms, it's mathematically complex even compared to other modern deep learning approaches. However, it's a lot easier to apparoach that inner and outer loop only occurs in learning and fast-adaption is sort of fine-tuning.
 
 ### Inner Loop
-The inner loop is the first stage of MAML's algorithm where task-specific adaptations occur. It involves taking a small number of examples (support set) from a new task and creating parameters for each task. It then performs gradient updates to quickly adapt the model parameters for that specific task.
+The inner loop is the first stage of MAML's algorithm where task-specific adaptations occur. It involves taking a small number of examples (support set) from a new task and creating parameters for each task.
 
 ```python
 class ResNetMAML(nn.Module):
@@ -93,7 +93,7 @@ class ResNetMAML(nn.Module):
     return local_param
 ```
 ### Outer Loop
-The outer-loop is the second stage of MAML's algorithm where meta-learning occurs. It optimizes the initial model parameters to ensure they can be quickly adapted to new tasks with minimal data. This stage uses performance on the query set to update the model's starting point.
+The outer-loop is the second stage of MAML's algorithm where meta-learning occurs. It optimizes the initial model parameters to ensure they can be optimized to new tasks with minimal data. This stage uses performance on the query set to update the model's starting point.
 
 ```python
 def train(model, path, config, episoder:FewShotEpisoder, device):
