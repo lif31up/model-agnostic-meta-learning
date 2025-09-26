@@ -129,6 +129,29 @@ def train(model, path, config, episoder:FewShotEpisoder, device):
   torch.save(features, f"{path}.bin")
 ```
 
+### Adapt
+`evaluate` includes `adapt()` which adapts the model that learned via MAML algorithms to new FSL tasks.
+
+```python
+def adapt(model, config, dataset, device, logging=False):
+  model = copy.deepcopy(model).to(device)
+  optim = torch.optim.Adam(model.parameters(), lr=config.alpha)
+  criterion = nn.CrossEntropyLoss()
+  progress_bar = range(config.iterations)
+  if logging: progress_bar = tqdm(progress_bar, desc="ADAPTING", leave=True)
+  for _ in progress_bar:
+    loss = float(0)
+    for feature, label in DataLoader(dataset, batch_size=config.batch_size, shuffle=True, pin_memory=True, num_workers=4):
+      feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
+      pred = model.forward(feature)
+      loss = criterion(pred, label)
+      optim.zero_grad()
+      loss.backward()
+      optim.step()
+    if logging: progress_bar.set_postfix(loss=loss.item())
+  return model
+```
+
 ### Forward
 The forward process in MAML differs significantly from other deep neural networks. First, it adapts to tasks from the query set. Then, it forwards each parameter per task and calculates probabilities.
 
