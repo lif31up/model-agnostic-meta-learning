@@ -93,7 +93,7 @@ class ResNetMAML(nn.Module):
     return local_param
 ```
 ### Outer Loop
-The outer-loop is the second stage of MAML's algorithm where difference occurs. It optimizes the local parameters from inner loop.
+The outer-loop is the second stage of MAML's algorithm where difference occurs. It optimizes the overall tasks the local parameters from the inner loop.
 
 ```python
 def train(model, path, config, episoder:FewShotEpisoder, device):
