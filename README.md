@@ -74,7 +74,7 @@ if __name__ == "__main__":
 ```
 ---
 ## Technical Highlights
-Although MAML is one of the most prominent few-shot learning algorithms, it's mathematically complex even compared to other modern deep learning approaches. However, it's a lot easier to apparoach that inner and outer loop only occurs in learning and fast-adaption is sort of fine-tuning.
+Although MAML is one of the most prominent few-shot learning algorithms, it's mathematically complex even compared to other modern deep learning approaches. However, it's a lot easier to apparoach that inner/outer loop only occurs in training and fast-adaption is sort of fine-tuning.
 
 ### Inner Loop
 The inner loop is the first stage of MAML's algorithm where task-specific adaptations occur. It involves taking a small number of examples (support set) from a new task and creating parameters for each task.
@@ -93,7 +93,7 @@ class ResNetMAML(nn.Module):
     return local_param
 ```
 ### Outer Loop
-The outer-loop is the second stage of MAML's algorithm where meta-learning occurs. It optimizes the initial model parameters to ensure they can be optimized to new tasks with minimal data. This stage uses performance on the query set to update the model's starting point.
+The outer-loop is the second stage of MAML's algorithm where difference occurs. It optimizes the local parameters from inner loop.
 
 ```python
 def train(model, path, config, episoder:FewShotEpisoder, device):
