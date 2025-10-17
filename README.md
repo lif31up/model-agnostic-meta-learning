@@ -6,15 +6,19 @@ This implementation is inspired by ["Model-Agnostic Meta-Learning for Fast Adapt
 **Implementations:**
 * `CNN_MAML`
 * `CNN_BOIL`
+* `CNN_ANIL`
 * `ResNet_MAML`
 * `ResNet_BOIL`
+* `ResNet_ANIL`
 
 **Results:**
 
 | 5w5s ACC            | CNN_MAML       | CNN_BOIL       | ResNet_MAML    | ResNet_BOIL   |
 |---------------------|----------------|----------------|----------------|---------------|
 | `Omniglot Futurama` | `86% (86/100)` | `83% (83/100)` | `86% (86/100)` | `90%(90/100)` |
+
 ---
+
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
 The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
 
