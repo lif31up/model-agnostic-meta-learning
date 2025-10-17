@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 import torch.nn.functional as F
 from config import Config
 
+
 class ResNet_MAML(nn.Module):
   def __init__(self, config: Config):
     super(ResNet_MAML, self).__init__()
@@ -104,3 +105,24 @@ class ResNet_BOIL(ResNet_MAML):
     return local_params
   # inner_update
 # ResNetBOIL
+
+class ResNet_ANIL(ResNet_MAML):
+  def inner_update(self, task, device=None):
+    local_params = {name: param.clone() for name, param in self.named_parameters()}  # init local params
+    for _ in range(self.config.iterations):  # update local params to the task
+      for feature, label in DataLoader(
+          dataset=task,
+          batch_size=self.config.batch_size,
+          shuffle=True,
+          pin_memory=True,
+          num_workers=4):
+        feature, label = feature.to(device, non_blocking=True), label.to(device, non_blocking=True)
+        pred = self.forward(feature, local_params)
+        loss = nn.MSELoss()(pred, label)
+        grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
+        local_params = {
+          name: param - self.config.alpha * grad if name.startswith('fc') else param for (name, param), grad in
+          zip(local_params.items(), grads)}  # freezing the convs
+    return local_params
+  # inner_update
+# ResNet_ANIL
