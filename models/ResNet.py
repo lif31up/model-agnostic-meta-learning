@@ -73,7 +73,7 @@ class ResNet_MAML(nn.Module):
         pred = self.forward(feature, local_param)
         loss = nn.MSELoss()(pred, label)
         grads = torch.autograd.grad(loss, list(local_param.values()), create_graph=True)
-        local_param = {name: param - (self.config.alpha * grad) for (name, param), grad in zip(local_param.items(), grads)}
+        local_param = {name: param - (self.config.alpha * grad) if not name.startswith('bn') else param for (name, param), grad in zip(local_param.items(), grads)}
     return local_param
   # inner_update
 
@@ -101,7 +101,7 @@ class ResNet_BOIL(ResNet_MAML):
         loss = nn.MSELoss()(pred, label)
         grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
         local_params = {
-          name: param - self.config.alpha * grad if not name.startswith('fc') else param for (name, param), grad in zip(local_params.items(), grads)}  # freezing the last layer
+          name: param - self.config.alpha * grad if not name.startswith('fc') and not name.startswith('bn') else param for (name, param), grad in zip(local_params.items(), grads)}  # freezing the last layer
     return local_params
   # inner_update
 # ResNetBOIL
@@ -121,7 +121,7 @@ class ResNet_ANIL(ResNet_MAML):
         loss = nn.MSELoss()(pred, label)
         grads = torch.autograd.grad(loss, list(local_params.values()), create_graph=True)
         local_params = {
-          name: param - self.config.alpha * grad if name.startswith('fc') else param for (name, param), grad in
+          name: param - self.config.alpha * grad if name.startswith('fc') and not name.startswith('bn') else param for (name, param), grad in
           zip(local_params.items(), grads)}  # freezing the convs
     return local_params
   # inner_update
