@@ -1,28 +1,17 @@
-[⭐ Colab Playground](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
+# MAML and Its Variants for FSL Image Classification
 
-This implementation is inspired by ["Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks"](https://arxiv.org/abs/1703.05175) (2017) by Jake Snell, Kevin Swersky, Richard S. Zemel, ["BOIL: Towards Representation Change for Few-shot Learning"](https://arxiv.org/abs/2008.08882) by Jaehoon Oh, Hyungjun Yoo, ChangHwan Kim, Se-Young Yun.
+This implementation is inspired by:
+- [Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks](https://arxiv.org/abs/1703.05175) by Jake Snell, Kevin Swersky, Richard S. Zemel
+- [BOIL: Towards Representation Change for Few-shot Learning](https://arxiv.org/abs/2008.08882) by Jaehoon Oh, Hyungjun Yoo, ChangHwan Kim, Se-Young Yun.
+- [Rapid Learning or Feature Reuse? Towards Understanding the Effectiveness of MAML](https://arxiv.org/abs/1909.09157) by Aniruddh Raghu, Maithra Raghu, Samy Bengio, Oriol Vinyals
 
-**Results:**
-
-| 5w5s ACC            | CNN_MAML       | CNN_BOIL       | ResNet_MAML    | ResNet_BOIL   |
-|---------------------|----------------|----------------|----------------|---------------|
-| `Omniglot Futurama` | `86% (86/100)` | `83% (83/100)` | `86% (86/100)` | `90%(90/100)` |
-
----
-
-## MAML and its Variants for FSL Classification
 FSL (Few-Shot Learning) enables models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to learn efficiently from limited data.
 
 * **Task**: classifying image with few dataset.
 * **Dataset**: `omniglot futurama`
 
-**Implemented:**
-* `CNN_MAML`
-* `CNN_BOIL`
-* `CNN_ANIL`
-* `ResNet_MAML`
-* `ResNet_BOIL`
-* `ResNet_ANIL`
+### Requirements
+To run the code on your own machine, run `pip install -r requirements.txt`.
 
 ### Configuration
 `confing.py` contains the configuration settings for the model, including the framework, dimensions, learning rates (alpha, beta), and other hyperparameters like kernel size.
