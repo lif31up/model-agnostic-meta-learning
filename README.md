@@ -1,4 +1,3 @@
-**This implementation is inspired by:**
 - [Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks (2017)](https://arxiv.org/abs/1703.05175) by Jake Snell, Kevin Swersky, Richard S. Zemel.
 - [BOIL: Towards Representation Change for Few-shot Learning (2020)](https://arxiv.org/abs/2008.08882) by Jaehoon Oh, Hyungjun Yoo, ChangHwan Kim, Se-Young Yun.
 - [Rapid Learning or Feature Reuse? Towards Understanding the Effectiveness of MAML (2019)](https://arxiv.org/abs/1909.09157) by Aniruddh Raghu, Maithra Raghu, Samy Bengio, Oriol Vinyals.
