@@ -1,9 +1,8 @@
 # MAML and Its Variants for FSL Image Classification
 
-This implementation is inspired by:
-[Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks](https://arxiv.org/abs/1703.05175) by Jake Snell, Kevin Swersky, Richard S. Zemel.
-[BOIL: Towards Representation Change for Few-shot Learning](https://arxiv.org/abs/2008.08882) by Jaehoon Oh, Hyungjun Yoo, ChangHwan Kim, Se-Young Yun.
-[Rapid Learning or Feature Reuse? Towards Understanding the Effectiveness of MAML](https://arxiv.org/abs/1909.09157) by Aniruddh Raghu, Maithra Raghu, Samy Bengio, Oriol Vinyals.
+This implementation is inspired by [Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks (2017)](https://arxiv.org/abs/1703.05175) by Jake Snell, Kevin Swersky, Richard S. Zemel.
+[BOIL: Towards Representation Change for Few-shot Learning (2020)](https://arxiv.org/abs/2008.08882) by Jaehoon Oh, Hyungjun Yoo, ChangHwan Kim, Se-Young Yun.
+[Rapid Learning or Feature Reuse? Towards Understanding the Effectiveness of MAML (2019)](https://arxiv.org/abs/1909.09157) by Aniruddh Raghu, Maithra Raghu, Samy Bengio, Oriol Vinyals.
 
 FSL (Few-Shot Learning) enables models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to learn efficiently from limited data.
 
