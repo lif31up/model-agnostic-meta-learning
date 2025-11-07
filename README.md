@@ -1,5 +1,5 @@
 This implementation is inspired by ["Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks"](https://arxiv.org/abs/1703.05175) (2017) by Jake Snell, Kevin Swersky, Richard S. Zemel, ["BOIL: Towards Representation Change for Few-shot Learning"](https://arxiv.org/abs/2008.08882) by Jaehoon Oh, Hyungjun Yoo, ChangHwan Kim, Se-Young Yun.
-* **Note & Reference:** [GitBook](https://lif31up.gitbook.io/lif31up/few-shot-learning/model-agnostic-meta-learning-for-fast-adaptation-of-deep-networks)
+
 * **⭐ Colab Playground:** [Colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
 
 **Implementations:**
@@ -19,14 +19,10 @@ This implementation is inspired by ["Model-Agnostic Meta-Learning for Fast Adapt
 ---
 
 ## Model-Agnostic Meta-Learning for Few-Shot Image Classification
-The main purpose was to implement the from-scratch Model-Agnostic Meta-Learning (MAML) algorithm that's easy to execute on educational cloud environments.
+FSL (Few-Shot Learning) enables models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to learn efficiently from limited data.
 
 * **Task**: classifying image with few dataset.
 * **Dataset**: `omniglot futurama`
-
-FSL(Few-Shot Learning) focuses on enabling models to generalize to new tasks with only a few labeled examples. 
-MAML achieves this by optimizing for local/gloval parameters concept that can quickly adapt to new tasks through gradient-based updates, allowing the model to efficiently learn from limited data. **[More explanation on GitBook]**
-
 
 ### Configuration
 `confing.py` contains the configuration settings for the model, including the framework, dimensions, learning rates (alpha, beta), and other hyperparameters like kernel size.

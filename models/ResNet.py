@@ -10,11 +10,21 @@ class ResNet_MAML(nn.Module):
     super(ResNet_MAML, self).__init__()
     self.config = config
     self.convs = self._create_convs(self.config.n_convs)
+    self.bns = self._create_bns(self.config.n_convs)
     self.act = nn.SiLU()
     self.flat = nn.Flatten(start_dim=1)
     self.pool = nn.MaxPool2d(stride=1, kernel_size=3)
     self.fc = self._get_fc(self.config.dummy)
   # __init__
+
+  def _create_bns(self, n_convs):
+    norms = nn.ModuleList()
+    for i in range(n_convs - 1):
+      norms.append(
+        nn.BatchNorm2d(self.config.batch_size)
+      )  # norms.append
+    return norms
+  #_create_bns
 
   def _create_convs(self, n_convs):
     layers = nn.ModuleList()
@@ -49,6 +59,7 @@ class ResNet_MAML(nn.Module):
       padding=self.config.padding
     )  # first conv
     x = self.act(x)
+    x = self.bns[0](x)
     for i in range(1, self.convs.__len__()):
       res = x
       x = F.conv2d(
@@ -59,6 +70,7 @@ class ResNet_MAML(nn.Module):
         padding=self.config.padding,
       )  # hidden convs
       x = self.act(x)
+      if not i >= self.convs.__len__(): x = self.bns[i](x) # skip BatchNorm at the last conv
       x += res
     x = self.pool(x)
     x = self.flat(x)
