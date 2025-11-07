@@ -10,6 +10,9 @@ FSL (Few-Shot Learning) enables models to generalize to new tasks with only a fe
 
 ### Requirements
 To run the code on your own machine, run `pip install -r requirements.txt`.
+```text
+tqdm>=4.67.1
+```
 
 ### Configuration
 `confing.py` contains the configuration settings for the model, including the framework, dimensions, learning rates (alpha, beta), and other hyperparameters like kernel size.
