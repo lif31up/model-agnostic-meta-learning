@@ -18,7 +18,7 @@ This implementation is inspired by ["Model-Agnostic Meta-Learning for Fast Adapt
 
 ---
 
-## Model-Agnostic Meta-Learning for Few-Shot Image Classification
+## MAML and its Variants for FSL Classification
 FSL (Few-Shot Learning) enables models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to learn efficiently from limited data.
 
 * **Task**: classifying image with few dataset.
