@@ -1,14 +1,6 @@
-* **⭐ Colab Playground:** [Colab](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
+[⭐ Colab Playground](https://colab.research.google.com/drive/1ZmtP8rMZsSN_yA6tz3IKQU0ECXeAI018?usp=sharing)
 
 This implementation is inspired by ["Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks"](https://arxiv.org/abs/1703.05175) (2017) by Jake Snell, Kevin Swersky, Richard S. Zemel, ["BOIL: Towards Representation Change for Few-shot Learning"](https://arxiv.org/abs/2008.08882) by Jaehoon Oh, Hyungjun Yoo, ChangHwan Kim, Se-Young Yun.
-
-**Implementations:**
-* `CNN_MAML`
-* `CNN_BOIL`
-* `CNN_ANIL`
-* `ResNet_MAML`
-* `ResNet_BOIL`
-* `ResNet_ANIL`
 
 **Results:**
 
@@ -23,6 +15,14 @@ FSL (Few-Shot Learning) enables models to generalize to new tasks with only a fe
 
 * **Task**: classifying image with few dataset.
 * **Dataset**: `omniglot futurama`
+
+**Implemented:**
+* `CNN_MAML`
+* `CNN_BOIL`
+* `CNN_ANIL`
+* `ResNet_MAML`
+* `ResNet_BOIL`
+* `ResNet_ANIL`
 
 ### Configuration
 `confing.py` contains the configuration settings for the model, including the framework, dimensions, learning rates (alpha, beta), and other hyperparameters like kernel size.
