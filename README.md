@@ -6,8 +6,8 @@ This implementation is inspired by:
 
 FSL (Few-Shot Learning) enables models to generalize to new tasks with only a few labeled examples. MAML achieves this by optimizing parameters that can quickly adapt to new tasks through gradient-based updates, allowing the model to learn efficiently from limited data.
 
-* **Task**: classifying image with few dataset.
-* **Dataset**: `omniglot futurama`
+* **Task**: Image Recognition
+* **Dataset**: Omniglot Futurama Alien Alphabet
 
 ### Requirements
 To run the code on your own machine, run `pip install -r requirements.txt`.
